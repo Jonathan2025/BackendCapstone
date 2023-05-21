@@ -5,16 +5,6 @@ from django.contrib.auth.models import User
 from django.conf import settings
 # Create your models here.
 
-# 7 We will create a location model
-class Location(models.Model):
-    address = models.CharField(_("address"), max_length=128) # the getlazy text marks the strings for translation
-    city = models.CharField(_("city"), max_length=64, default="")
-    state = USStateField(_("state"), default="")
-    zip_code = USZipCodeField(_("zip code"), default="")
-
-    # define a string method that will give the full location 
-    def __str__(self):
-        return self.address + ', ' + self.city + ', ' + self.state + ', ' + self.zip_code
 
 # 6 We will use the models to create the tables we need 
 class Post(models.Model):
@@ -26,7 +16,7 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
-    comments = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name="comments_of_post")
+    comments = models.ForeignKey('Comment', on_delete=models.CASCADE, null=True, blank=True, related_name="comments_of_post")
     # Normally we would refer out to the COMMENT model but since its defined after the post model, we can use a string instead
 
 
@@ -40,13 +30,6 @@ class Post(models.Model):
     # override the default __str__ method to return the title and category of the post 
     def __str__(self): 
         return self.title + ', ' + self.category
-
-    # 
-
- 
-
-
-
 
 # 8 User Model
 # We will be using the default USER model that comes with django.contrib.auth¶
@@ -66,7 +49,7 @@ class Comment(models.Model):
     checked = models.BooleanField(default = True) #This determins to show the comment or not, but not automatically, again when it is used we will also need to use some method/logic to see if something should be visible
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True) # parent will refer to a parent comment. It is set to "self" because
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True) # parent will refer to a parent comment. It is set to "self" because
     # Self referencing foreign keys are used to model nested relationships
     # behind the scenes, DJANGO will create an id field "parent_id" to store the ID of the parent comment 
 
@@ -75,7 +58,7 @@ class Comment(models.Model):
 
     # If we have a reply comment, its going to have a parent comment --> so we can get the parent id
     def parent_comment_id(self): 
-        return self.parent
+        return self.parent_id
 
     # Return a boolean whether or not the comment is a parent OR a reply 
     def isReply_or_parent(self):
@@ -92,13 +75,25 @@ class Comment(models.Model):
 #10 userprofile model
 class UserProfile(models.Model):
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_profile_username')
-    first_name = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_profile_first_name')
-    last_name = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_profile_last_name' )
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=25, null=True, blank=True)
+    last_name = models.CharField(max_length=25, null=True, blank=True)
     beltLevel = models.CharField(max_length=25, null=True, blank=True)
     userDesc = models.TextField(null=True, blank=True)
     martialArt = models.CharField(max_length=25, null=True, blank=True) # user enters what martial arts they practice 
 
+    address = models.CharField(_("address"), max_length=128, default="") # the getlazy text marks the strings for translation
+    city = models.CharField(_("city"), max_length=64, default="")
+    state = USStateField(_("state"), default="")
+    zip_code = USZipCodeField(_("zip code"), default="")
+
+
+
+
     # override the default __str__ method to return the first and last name of the user along with the martial art they practice
     def __str__(self): 
         return self.first_name + ' ' + self.last_name + f' (${self.martialArt})'
+    
+
+    # define a string method that will give the full location of the user
+    def user_location(self):
+        return self.address + ', ' + self.city + ', ' + self.state + ', ' + self.zip_code
