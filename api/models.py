@@ -18,8 +18,8 @@ class Location(models.Model):
 
 # 6 We will use the models to create the tables we need 
 class Post(models.Model):
-    title=models.TextField(null=True, blank=True)
-    category=models.TextField(null=True, blank=True)
+    title=models.CharField(max_length=50, null=True, blank=True)
+    category=models.CharField(max_length=25, null=True, blank=True)
     postDesc=models.TextField(null=True, blank=True)
     upload = models.CharField(max_length=250) # the video will be uploaded to Azure 
     # Since its being uploaded to Azure, theres no need to define a specific data type , but we can use a URLfield or charfield to store the URL/ identifier of the video file in azure
@@ -95,9 +95,9 @@ class UserProfile(models.Model):
     first_name = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_profile_first_name')
     last_name = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_profile_last_name' )
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    beltLevel = models.TextField(null=True, blank=True)
+    beltLevel = models.CharField(max_length=25, null=True, blank=True)
     userDesc = models.TextField(null=True, blank=True)
-    martialArt = models.TextField(null=True, blank=True) # user enters what martial arts they practice 
+    martialArt = models.CharField(max_length=25, null=True, blank=True) # user enters what martial arts they practice 
 
     # override the default __str__ method to return the first and last name of the user along with the martial art they practice
     def __str__(self): 
