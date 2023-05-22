@@ -4,5 +4,6 @@ from django.urls import path
 from . import views 
 
 urlpatterns = [
-    path('', views.getRoutes, name="routes") # this will be like the home page route 
+    path('', views.getRoutes, name="routes"), # this will be like the home page route 
+    path('posts/', views.getPosts, name="posts"), # get posts route
 ]

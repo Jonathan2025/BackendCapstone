@@ -1,12 +1,16 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from rest_framework.response import Response # now we will begin to use the django rest framework which will streamline the process of building APIs and endpoints
+from rest_framework.decorators import api_view
+
+
 
 # Create your views here.
 
-# 2 we will create a simple getRoutes here 
+# The api_view decorator is part of the Django REST framework and is used to define the view function or method as an API endpoint
+# long story short, it allows us to create routes for the Django API endpoints
+@api_view(['GET'])
 def getRoutes(request): 
-
-    # 5 Now we will create some sample routes for now 
+    # Now we will create some sample routes for now 
     routes = [
         {
             'Endpoint': '/posts/',
@@ -41,10 +45,13 @@ def getRoutes(request):
     ]
 
 
+# GET posts - get all the posts that have been made 
+@api_view(['GET'])
+def getPosts(request):
+    return Response('POSTSSSS')
 
 
 
 
 
-
-    return JsonResponse(routes, safe=False) #safe just allows us to get back more data than just a dictionary
+    return Response(routes)
