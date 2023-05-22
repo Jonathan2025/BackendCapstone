@@ -16,9 +16,6 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
-    comments = models.ForeignKey('Comment', on_delete=models.CASCADE, null=True, blank=True, related_name="comments_of_post")
-    # Normally we would refer out to the COMMENT model but since its defined after the post model, we can use a string instead
-
 
     # 11 now we can add metadata to a model, we need the class Meta
     # Metadata is an optional entity within a model and it is anything that is not a field
@@ -45,7 +42,7 @@ class Post(models.Model):
 class Comment(models.Model):
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     commentDesc = models.CharField(max_length=150)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_of_comment")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments") # Foreign key establishes a relationship between comments with the post, thats why we set related name to comments
     checked = models.BooleanField(default = True) #This determins to show the comment or not, but not automatically, again when it is used we will also need to use some method/logic to see if something should be visible
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -85,9 +82,6 @@ class UserProfile(models.Model):
     city = models.CharField(_("city"), max_length=64, default="")
     state = USStateField(_("state"), default="")
     zip_code = USZipCodeField(_("zip code"), default="")
-
-
-
 
     # override the default __str__ method to return the first and last name of the user along with the martial art they practice
     def __str__(self): 

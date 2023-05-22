@@ -12,5 +12,9 @@ urlpatterns = [
 
     # UserProfile Routes
     path('userProfiles/', views.getUserProfiles, name="userProfiles"), # get userProfiles route
+    path('userProfiles/<str:id>', views.getUserProfile, name="userProfile"), # get a specific user profile
 
+    # Comment Routes
+    path('comments/', views.getComments, name="comments"), # get all the comments for the ENTIRE APP
+    path('posts/<str:id>/comments/', views.getPostComments, name="postComments"), # get all the comments for a specific post 
 ]
