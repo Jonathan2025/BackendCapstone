@@ -113,6 +113,21 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
     serializer = UserProfileSerializer(userProfile, many=False) # here we will use the serializer. We pass in the user profile object
     return Response(serializer.data)
 
+#CREATE userProfile - create a user Profile
+@api_view(['POST'])
+def createUserProfile(request):
+    data = request.data
+    userProfile = UserProfile.objects.create(**data) # when we create a userProfile, we want to pass in all the attributes
+    serializer = PostSerializer(userProfile, many=False)
+    return Response(serializer.data)
+
+
+
+
+
+
+
+
 #----------------------------------------------------------------------------------
 
 # Comments are actually going to be a bit different because we will be accessing them with a specific post 
@@ -136,4 +151,3 @@ def getPostComments(request, id):
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
-# get Post Comment - get the specific comment for a specific post 

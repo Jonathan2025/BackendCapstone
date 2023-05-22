@@ -8,7 +8,6 @@ urlpatterns = [
 
     # the Posts routes
     path('posts/', views.getPosts, name="posts"), # get posts route
-   
     path('posts/create', views.createPost, name="create-post"), # create a post
     path('posts/<str:id>/update', views.updatePost, name="update-post"), # update a specific post
     path('posts/<str:id>/delete', views.deletePost, name="delete-post"), # delete a specific post
@@ -18,6 +17,11 @@ urlpatterns = [
     # UserProfile Routes
     path('userProfiles/', views.getUserProfiles, name="userProfiles"), # get userProfiles route
     path('userProfiles/<str:id>', views.getUserProfile, name="userProfile"), # get a specific user profile
+    path('userProfiles/create', views.createUserProfile, name="create-userProfile"), # create a user profile 
+
+
+
+
 
     # Comment Routes
     path('comments/', views.getComments, name="comments"), # get all the comments for the ENTIRE APP
