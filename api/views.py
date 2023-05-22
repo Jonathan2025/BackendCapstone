@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response # now we will begin to use the django rest framework which will streamline the process of building APIs and endpoints
 from rest_framework.decorators import api_view
 from .models import Post, UserProfile, Comment, User # import our models so then in the routes we can render the data 
-from .serializers import PostSerializer # import the serializer
+from .serializers import PostSerializer, UserProfileSerializer # import the serializer
 
 # Create your views here.
 
@@ -63,6 +63,14 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     return Response(serializer.data)
 
 
+
+# GET UserProfile - get all of the user profiles that have been made 
+@api_view(['GET'])
+def getUserProfiles(request):  
+    userProfiles = UserProfile.objects.all() # query for all of the user profiles that have been made
+    # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
+    serializer = UserProfileSerializer(userProfiles, many=True) # here we will use the serializer. We pass in the userProfiles object
+    return Response(serializer.data)
 
 
     return Response(routes)
