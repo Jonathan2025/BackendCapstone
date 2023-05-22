@@ -8,8 +8,9 @@ urlpatterns = [
 
     # the Posts routes
     path('posts/', views.getPosts, name="posts"), # get posts route
-    path('posts/<str:id>', views.getPost, name="post"), # get post (get a specific post) route
+   
     path('posts/<str:id>/update', views.updatePost, name="update-post"), # update a specific post
+    path('posts/<str:id>', views.getPost, name="post"), # get post (get a specific post) route
 
 
     # UserProfile Routes

@@ -76,8 +76,9 @@ def updatePost(request, id):
     # This is then used to update the data in the DB
     if serializer.is_valid():
         serializer.save()
-    
-    return Response(serializer.data)
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #----------------------------------------------------------------------------------
 
