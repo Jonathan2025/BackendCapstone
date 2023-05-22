@@ -80,6 +80,14 @@ def updatePost(request, id):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# DELETE POST
+@api_view(['DELETE'])
+def deletePost(request, id):
+    post = Post.objects.get(id=id)
+    post.delete()
+    return Response('Post has been deleted')
+
+
 #----------------------------------------------------------------------------------
 
 # GET UserProfile - get all of the user profiles that have been made 

@@ -10,6 +10,7 @@ urlpatterns = [
     path('posts/', views.getPosts, name="posts"), # get posts route
    
     path('posts/<str:id>/update', views.updatePost, name="update-post"), # update a specific post
+    path('posts/<str:id>/delete', views.deletePost, name="delete-post"), # delete a specific post
     path('posts/<str:id>', views.getPost, name="post"), # get post (get a specific post) route
 
 
