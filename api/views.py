@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response # now we will begin to use the django rest framework which will streamline the process of building APIs and endpoints
 from rest_framework.decorators import api_view
-
-
+from .models import Post, UserProfile, Comment, User # import our models so then in the routes we can render the data 
+from .serializers import PostSerializer # import the serializer
 
 # Create your views here.
 
@@ -47,8 +47,11 @@ def getRoutes(request):
 
 # GET posts - get all the posts that have been made 
 @api_view(['GET'])
-def getPosts(request):
-    return Response('POSTSSSS')
+def getPosts(request):  
+    posts = Post.objects.all() # query for all of the posts that have been made
+    # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
+    serializer = PostSerializer(posts, many=True) # here we will use the serializer. We pass in the posts object
+    return Response(serializer.data)
 
 
 
