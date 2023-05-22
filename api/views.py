@@ -63,6 +63,14 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
 
+#CREATE Post - create a singular post 
+@api_view(['POST'])
+def createPost(request):
+    data = request.data
+    post = Post.objects.create(**data) # when we create the post, we want to pass in all the attributes
+    serializer = PostSerializer(post, many=False)
+    return Response(serializer.data)
+
 
 # PUT post - UPDATE a specific post 
 @api_view(['PUT'])
