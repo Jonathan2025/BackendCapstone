@@ -63,6 +63,22 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
 
+
+# PUT post - UPDATE a specific post 
+@api_view(['PUT'])
+def updatePost(request, id):
+    data = request.data # similar to req.body
+    post = Post.objects.get(id=id)
+    serializer = PostSerializer(instance = post, data = data) # we pass in the instance of the note that we are serializing and then we are passing in the new data
+    
+
+    #is_valid perform validation of input data and confirm that this data contain all required fields and all fields have correct types.
+    # This is then used to update the data in the DB
+    if serializer.is_valid():
+        serializer.save()
+    
+    return Response(serializer.data)
+
 #----------------------------------------------------------------------------------
 
 # GET UserProfile - get all of the user profiles that have been made 
