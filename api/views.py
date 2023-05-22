@@ -54,6 +54,14 @@ def getPosts(request):
     return Response(serializer.data)
 
 
+# GET post - get a SINGULAR post that have been made 
+@api_view(['GET'])
+def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
+    posts = Post.objects.get(id=id) # query to get the post id from the url params
+    # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
+    serializer = PostSerializer(posts, many=False) # here we will use the serializer. We pass in the posts object
+    return Response(serializer.data)
+
 
 
 
