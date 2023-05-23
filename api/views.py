@@ -118,10 +118,21 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
 def createUserProfile(request):
     data = request.data
     userProfile = UserProfile.objects.create(**data) # when we create a userProfile, we want to pass in all the attributes
-    serializer = PostSerializer(userProfile, many=False)
+    serializer = UserProfileSerializer(userProfile, many=False)
     return Response(serializer.data)
 
-
+# PUT userProfile - UPDATE a userProfile
+@api_view(['PUT'])
+def updateUserProfile(request, id):
+    data = request.data # similar to req.body
+    userProfile = UserProfile.objects.get(id=id)
+    serializer = UserProfileSerializer(instance = userProfile, data = data) 
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
