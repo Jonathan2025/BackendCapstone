@@ -16,9 +16,10 @@ urlpatterns = [
 
     # UserProfile Routes
     path('userProfiles/', views.getUserProfiles, name="userProfiles"), # get userProfiles route
-    path('userProfiles/create', views.createUserProfile, name="create-userProfile"), # create a user profile 
-    path('userProfiles/<str:id>/update', views.updateUserProfile, name="update-userProfile"), # update a specific user profile
-    path('userProfiles/<str:id>', views.getUserProfile, name="userProfile"), # get a specific user profile
+    path('userProfiles/create', views.createUserProfile, name="create-userProfile"), 
+    path('userProfiles/<str:id>/update', views.updateUserProfile, name="update-userProfile"), 
+    path('userProfiles/<str:id>/delete', views.deleteUserProfile, name="delete-userProfile"), 
+    path('userProfiles/<str:id>', views.getUserProfile, name="userProfile"), # get a specific userprofile
     
 
 

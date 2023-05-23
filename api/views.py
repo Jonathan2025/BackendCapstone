@@ -132,9 +132,16 @@ def updateUserProfile(request, id):
         serializer.save()
         return Response(serializer.data)
     else:
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# DELETE User Profile
+@api_view(['DELETE'])
+def deleteUserProfile(request, id):
+    userProfile = UserProfile.objects.get(id=id)
+    userProfile.delete()
+    return Response('User Profile has been deleted')
 
 
 
@@ -162,3 +169,8 @@ def getPostComments(request, id):
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+
+# --------------------------------------------------------------------------
+
+# Routes for the authentication
