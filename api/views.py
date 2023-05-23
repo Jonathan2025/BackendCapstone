@@ -4,7 +4,35 @@ from rest_framework.decorators import api_view
 from .models import Post, UserProfile, Comment, User # import our models so then in the routes we can render the data 
 from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer # import the serializer
 from rest_framework import status # import status so we can use the status codes 
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 # Create your views here.
+
+
+# Here we can customize the token claim
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['username'] = user.username # the username will also be encrypted into the token 
+
+        return token
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
+
+
+
+
+
+
+
 
 # The api_view decorator is part of the Django REST framework and is used to define the view function or method as an API endpoint
 # long story short, it allows us to create routes for the Django API endpoints

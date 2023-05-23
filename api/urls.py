@@ -2,9 +2,22 @@
 
 from django.urls import path
 from . import views 
+from .views import MyTokenObtainPairView
+
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
+
+
 
 urlpatterns = [
     path('', views.getRoutes, name="routes"), # this will be like the home page route 
+
+    # URL patterns for the web tokens 
+    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
 
     # the Posts routes
     path('posts/', views.getPosts, name="posts"), # get posts route
