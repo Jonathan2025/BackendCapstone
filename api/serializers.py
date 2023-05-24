@@ -2,7 +2,11 @@
 from rest_framework.serializers import ModelSerializer
 from .models import Post, UserProfile, Comment
 
-
+# imports needed for the register serializer
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth.password_validation import validate_password
 
 
 # Comment serializer - to serialize the comment model 
@@ -25,3 +29,47 @@ class UserProfileSerializer(ModelSerializer):
         model = UserProfile
         fields = '__all__'
 
+
+
+# Login Register serializer 
+class RegisterSerializer(ModelSerializer):
+    # here we are creating new attributes email, pw1 and pw2
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+        )
+
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        # these are the attributes that our registration form will contain 
+        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name')
+        # we then set extra validations with the extra_kwargs option
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True}
+        }
+
+    # here we validate that the passwords are the same 
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+
+        return attrs
+
+    # we send a POST request to the register endpoint 
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
+        )
+
+            
+        user.set_password(validated_data['password'])
+        user.save()
+
+        return user

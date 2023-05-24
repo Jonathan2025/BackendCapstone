@@ -1,16 +1,24 @@
 from django.shortcuts import render
 from rest_framework.response import Response # now we will begin to use the django rest framework which will streamline the process of building APIs and endpoints
 from rest_framework.decorators import api_view, permission_classes # import permission classes
-from .models import Post, UserProfile, Comment, User # import our models so then in the routes we can render the data 
-from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer # import the serializer
+from .models import Post, UserProfile, Comment # import our models so then in the routes we can render the data 
+from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer, RegisterSerializer # import the serializer
 from rest_framework import status # import status so we can use the status codes 
 
+
+# Import these for UserAuthentication/ tokens/ Login/ Register 
 from rest_framework.permissions import IsAuthenticated
-
-
-
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
+from rest_framework import generics
+
+
+
+
+
+
 
 # Create your views here.
 
@@ -28,6 +36,11 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+# Set up the registerview 
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
 
 
 

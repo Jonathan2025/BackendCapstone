@@ -2,7 +2,7 @@
 
 from django.urls import path
 from . import views 
-from .views import MyTokenObtainPairView
+from .views import MyTokenObtainPairView, RegisterView
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -13,11 +13,11 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('', views.getRoutes, name="routes"), # this will be like the home page route 
 
-    # URL patterns for the web tokens 
+    # URL patterns for the web tokens/login/registeration
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-
+    path('register/', RegisterView.as_view(), name='auth_register'),
+    
 
     # the Posts routes
     path('posts/', views.getPosts, name="posts"), # get posts route
