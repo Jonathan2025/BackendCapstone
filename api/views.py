@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from rest_framework.response import Response # now we will begin to use the django rest framework which will streamline the process of building APIs and endpoints
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes # import permission classes
 from .models import Post, UserProfile, Comment, User # import our models so then in the routes we can render the data 
 from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer # import the serializer
 from rest_framework import status # import status so we can use the status codes 
+
+from rest_framework.permissions import IsAuthenticated
+
+
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -16,10 +20,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
         # Add custom claims
         token['username'] = user.username # the username will also be encrypted into the token 
-
         return token
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -82,9 +84,9 @@ def getPosts(request):
     serializer = PostSerializer(posts, many=True) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
 
-
 # GET post - get a SINGULAR post that have been made 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they can access a certain post 
 def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
     post = Post.objects.get(id=id) # query to get the post id from the url params
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
@@ -93,6 +95,7 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 
 #CREATE Post - create a singular post 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def createPost(request):
     data = request.data
     post = Post.objects.create(**data) # when we create the post, we want to pass in all the attributes
@@ -102,6 +105,7 @@ def createPost(request):
 
 # PUT post - UPDATE a specific post 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updatePost(request, id):
     data = request.data # similar to req.body
     post = Post.objects.get(id=id)
@@ -118,6 +122,7 @@ def updatePost(request, id):
 
 # DELETE POST
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deletePost(request, id):
     post = Post.objects.get(id=id)
     post.delete()
@@ -128,6 +133,7 @@ def deletePost(request, id):
 
 # GET UserProfile - get all of the user profiles that have been made 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getUserProfiles(request):  
     userProfiles = UserProfile.objects.all() # query for all of the user profiles that have been made
     serializer = UserProfileSerializer(userProfiles, many=True) # here we will use the serializer. We pass in the userProfiles object
@@ -135,6 +141,7 @@ def getUserProfiles(request):
 
 # GET user profile - get a SINGULAR user profile that have been made 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getUserProfile(request, id):  #in django id You will be able to access a specific userprofile because id is the params in the url
     userProfile = UserProfile.objects.get(id=id) # query to get the post id from the url params
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
@@ -143,6 +150,7 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
 
 #CREATE userProfile - create a user Profile
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def createUserProfile(request):
     data = request.data
     userProfile = UserProfile.objects.create(**data) # when we create a userProfile, we want to pass in all the attributes
@@ -151,6 +159,7 @@ def createUserProfile(request):
 
 # PUT userProfile - UPDATE a userProfile
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateUserProfile(request, id):
     data = request.data # similar to req.body
     userProfile = UserProfile.objects.get(id=id)
@@ -166,6 +175,7 @@ def updateUserProfile(request, id):
 
 # DELETE User Profile
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteUserProfile(request, id):
     userProfile = UserProfile.objects.get(id=id)
     userProfile.delete()
