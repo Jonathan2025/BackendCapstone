@@ -194,9 +194,6 @@ def deleteUserProfile(request, id):
     userProfile.delete()
     return Response('User Profile has been deleted')
 
-
-
-
 #----------------------------------------------------------------------------------
 
 # Comments are actually going to be a bit different because we will be accessing them with a specific post 
@@ -220,8 +217,24 @@ def getPostComments(request, id):
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
+#Create Comment - create a comment on the post 
+@api_view(['POST'])
+def createPostComment(request, id):
+    try: 
+        post = Post.objects.get(id=id)
+
+        #Extract the data from the request 
+        data = request.data 
+        data['post'] = post 
+
+        # Create a new comment instance
+        new_comment = Comment.objects.create(**data)
+
+        # Serialize the comment and return the serialized data 
+        serializer = CommentSerializer(new_comment, many=False)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Post.DoesNotExist:
+        return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# --------------------------------------------------------------------------
 
-# Routes for the authentication

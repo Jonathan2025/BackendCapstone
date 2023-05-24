@@ -41,5 +41,6 @@ urlpatterns = [
 
     # Comment Routes
     path('comments/', views.getComments, name="comments"), # get all the comments for the ENTIRE APP
-    path('posts/<str:id>/comments/', views.getPostComments, name="postComments"), # get all the comments for a specific post 
+    path('posts/<str:id>/comments/', views.getPostComments, name="postComments"), # get all the comments for a specific post
+    path('posts/<str:id>/comments/create', views.createPostComment, name="create-comment")
 ]
