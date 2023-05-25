@@ -258,5 +258,25 @@ def updatePostComment(request, id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Delete an existing comment 
+@api_view(['DELETE'])
+def deletePostComment(request, id):
+    # the comment id that is being deleted is going to be from the request
+    comment_id = request.data.get('id')
+    # there should be a comment ID but in the instance there isnt one, then return an error
+    if comment_id is None:
+        return Response({'error': 'Comment ID is missing'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # now if there is a comment ID we will delete it
+    try: 
+        comment = Comment.objects.get(id=comment_id)
+        comment.delete()
+        return Response({'message': 'Comment has been deleted'})
+    except Comment.DoesNotExist:
+        return Response({'error': 'Comment does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+
+
+  

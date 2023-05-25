@@ -39,5 +39,6 @@ urlpatterns = [
     path('comments/', views.getComments, name="comments"), # get all the comments for the ENTIRE APP
     path('posts/<str:id>/comments/', views.getPostComments, name="postComments"), # get all the comments for a specific post
     path('posts/<str:id>/createComment', views.createPostComment, name="create-comment"),
-    path('posts/<str:id>/updateComment', views.updatePostComment, name="update-comment")
+    path('posts/<str:id>/updateComment', views.updatePostComment, name="update-comment"),
+    path('posts/<str:id>/deleteComment', views.deletePostComment, name="delete-comment")
 ]
