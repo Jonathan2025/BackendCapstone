@@ -99,7 +99,7 @@ def getPosts(request):
 
 # GET post - get a SINGULAR post that have been made 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they can access a certain post 
+# @permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they can access a certain post 
 def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
     post = Post.objects.get(id=id) # query to get the post id from the url params
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
@@ -219,6 +219,7 @@ def getPostComments(request, id):
 
 #Create Comment - create a comment on the post 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def createPostComment(request, id):
     try: 
         post = Post.objects.get(id=id)
@@ -226,6 +227,10 @@ def createPostComment(request, id):
         #Extract the data from the request 
         data = request.data 
         data['post'] = post 
+
+        # When the comment is created, the user has to be logged in. So the username will be the person logged in 
+        data['username'] = request.user.username
+        
 
         # Create a new comment instance
         new_comment = Comment.objects.create(**data)
@@ -235,6 +240,23 @@ def createPostComment(request, id):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+#Update an Existing Comment 
+@api_view(['PUT'])
+def updatePostComment(request, id): 
+    data = request.data # similar to req.body
+    comment = Comment.objects.get(id=id)
+    data['post'] = comment.post.id # the post value will be from the retrieved comment
+    serializer = CommentSerializer(instance = comment, data = data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    else: 
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
