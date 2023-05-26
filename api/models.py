@@ -15,7 +15,7 @@ class Post(models.Model):
     # Since its being uploaded to Azure, theres no need to define a specific data type , but we can use a URLfield or charfield to store the URL/ identifier of the video file in azure
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
-    username = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
+    userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
 
     # 11 now we can add metadata to a model, we need the class Meta
     # Metadata is an optional entity within a model and it is anything that is not a field
@@ -23,10 +23,10 @@ class Post(models.Model):
     class Meta:
         ordering = ['created'] # here we will order the posts by the date they were created 
 
-
     # override the default __str__ method to return the title and category of the post 
     def __str__(self): 
         return self.title + ', ' + self.category
+
 
 # 8 User Model
 # We will be using the default USER model that comes with django.contrib.auth¶
@@ -40,7 +40,7 @@ class Post(models.Model):
 
 # 9 Comments Model 
 class Comment(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     commentDesc = models.CharField(max_length=150)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments") # Foreign key establishes a relationship between comments with the post, thats why we set related name to comments
     checked = models.BooleanField(default = True) #This determins to show the comment or not, but not automatically, again when it is used we will also need to use some method/logic to see if something should be visible
@@ -71,7 +71,7 @@ class Comment(models.Model):
 
 #10 userprofile model
 class UserProfile(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_profile_username', null=True, blank=True)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_profile_username', null=True, blank=True)
     first_name = models.CharField(max_length=25, null=True, blank=True)
     last_name = models.CharField(max_length=25, null=True, blank=True)
     beltLevel = models.CharField(max_length=25, null=True, blank=True)
