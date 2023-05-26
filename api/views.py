@@ -240,6 +240,7 @@ def createPostComment(request, id):
 
 #Update an Existing Comment 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updatePostComment(request, id): 
     data = request.data # similar to req.body
     comment = Comment.objects.get(id=id)
@@ -256,16 +257,17 @@ def updatePostComment(request, id):
 
 # Delete an existing comment 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deletePostComment(request, id):
-    # the comment id that is being deleted is going to be from the request
-    comment_id = request.data.get('id')
+    comment_id = request.data.get('id') # the comment id that is being deleted is going to be from the request
+   
     # there should be a comment ID but in the instance there isnt one, then return an error
     if comment_id is None:
         return Response({'error': 'Comment ID is missing'}, status=status.HTTP_400_BAD_REQUEST)
-    
+   
     # now if there is a comment ID we will delete it
     try: 
-        comment = Comment.objects.get(id=comment_id)
+        comment = Comment.objects.get(id=comment_id) # search through all comments to match its id with comment being deleted
         comment.delete()
         return Response({'message': 'Comment has been deleted'})
     except Comment.DoesNotExist:
