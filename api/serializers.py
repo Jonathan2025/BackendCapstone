@@ -11,7 +11,6 @@ from django.contrib.auth.password_validation import validate_password
 
 # Comment serializer - to serialize the comment model 
 class CommentSerializer(ModelSerializer):
-    username = serializers.ReadOnlyField(source='userId.username') #The model doesnt by default have a username field so we need to build one from the userId which is the FK for these models
     class Meta: 
         model = Comment
         fields = '__all__'
@@ -19,7 +18,6 @@ class CommentSerializer(ModelSerializer):
 # postserializer - to serialize the post models
 class PostSerializer(ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True) #here we want to be able to get the actual comments. It needs to be outside the meta class
-    username = serializers.ReadOnlyField(source='userId.username') #The model doesnt by default have a username field so we need to build one from the userId which is the FK for these models
     class Meta: 
         model = Post #specify the model we will serialize 
         fields = '__all__' # here we specified that we want to serialize ALL the fields in the model, BUT we can list out certain ones  
@@ -27,7 +25,6 @@ class PostSerializer(ModelSerializer):
 
 #userprofile serializer - to serialize the user profile model
 class UserProfileSerializer(ModelSerializer):
-    username = serializers.ReadOnlyField(source='userId.username') #The model doesnt by default have a username field so we need to build one from the userId which is the FK for these models
     class Meta: 
         model = UserProfile
         fields = '__all__'

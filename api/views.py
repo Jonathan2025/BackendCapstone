@@ -226,14 +226,10 @@ def createPostComment(request, id):
 
         #Extract the data from the request 
         data = request.data 
-        data['post'] = post 
-
-        # When the comment is created, the user has to be logged in. So the username will be the person logged in 
-        data['username'] = request.user.username
+        data['post'] = post
+        data['userId'] = request.user # When the comment is created, the userId has to be the user that is logged in. 
         
-
-        # Create a new comment instance
-        new_comment = Comment.objects.create(**data)
+        new_comment = Comment.objects.create(**data) # Create a new comment instance
 
         # Serialize the comment and return the serialized data 
         serializer = CommentSerializer(new_comment, many=False)

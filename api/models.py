@@ -47,6 +47,7 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True) # parent will refer to a parent comment. It is set to "self" because
+    username = models.CharField(max_length=50, default='Default Username') #The username will be passed through the frontend when the user creates a comment 
     # Self referencing foreign keys are used to model nested relationships
     # behind the scenes, DJANGO will create an id field "parent_id" to store the ID of the parent comment 
 
