@@ -4,8 +4,6 @@ from rest_framework.decorators import api_view, permission_classes # import perm
 from .models import Post, UserProfile, Comment # import our models so then in the routes we can render the data 
 from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer, RegisterSerializer # import the serializer
 from rest_framework import status # import status so we can use the status codes 
-
-
 # Import these for UserAuthentication/ tokens/ Login/ Register 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -15,13 +13,7 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 
 
-
-
-
-
-
 # Create your views here.
-
 
 # Here we can customize the token claim
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -41,11 +33,6 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
-
-
-
-
-
 
 
 
@@ -172,7 +159,6 @@ def createUserProfile(request):
 
 # PUT userProfile - UPDATE a userProfile
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def updateUserProfile(request, id):
     data = request.data # similar to req.body
     userProfile = UserProfile.objects.get(id=id)
@@ -196,9 +182,6 @@ def deleteUserProfile(request, id):
 
 #----------------------------------------------------------------------------------
 
-# Comments are actually going to be a bit different because we will be accessing them with a specific post 
-# They will be shown, made, edited and deleted on the post page 
-
 # GET Comments - get all of the comments that have been made for the ENTIRE APP
 @api_view(['GET'])
 def getComments(request):  
@@ -217,33 +200,39 @@ def getPostComments(request, id):
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
-#Create Comment - create a comment on the post 
+# CREATE Comment 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createPostComment(request, id):
-    try: 
+    try:
         post = Post.objects.get(id=id)
-
-        #Extract the data from the request 
-        data = request.data 
+        data = request.data # Extract the data from the request
         data['post'] = post
-        data['userId'] = request.user # When the comment is created, the userId has to be the user that is logged in. 
-        
-        new_comment = Comment.objects.create(**data) # Create a new comment instance
+        data['userId'] = request.user  # When the comment is created, the userId has to be the user that is logged in.
+        parent_comment_id = data.get('parent')  # Get the parent comment ID if it exists
 
-        # Serialize the comment and return the serialized data 
+        if parent_comment_id:
+            try:
+                parent_comment = Comment.objects.get(id=parent_comment_id, post=post)
+                data['parent'] = parent_comment  # Set the parent comment for the new comment
+            except Comment.DoesNotExist:
+                return Response({'error': 'Parent comment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        new_comment = Comment.objects.create(**data)  # Create a new comment instance
+
+        # Serialize the comment and return the serialized data
         serializer = CommentSerializer(new_comment, many=False)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
 #Update an Existing Comment 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updatePostComment(request, id): 
     data = request.data # similar to req.body
-    comment = Comment.objects.get(id=id)
+    comment_id = request.data.get('id')
+    comment = Comment.objects.get(id=comment_id)
     data['post'] = comment.post.id # the post value will be from the retrieved comment
     serializer = CommentSerializer(instance = comment, data = data)
 
@@ -253,7 +242,6 @@ def updatePostComment(request, id):
     else: 
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # Delete an existing comment 
 @api_view(['DELETE'])

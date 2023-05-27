@@ -1,5 +1,5 @@
 # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .models import Post, UserProfile, Comment
 
 # imports needed for the register serializer
@@ -8,12 +8,17 @@ from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
-
 # Comment serializer - to serialize the comment model 
 class CommentSerializer(ModelSerializer):
+    replies = SerializerMethodField() # since replies is not a field explicitly in the comments model, its created in the frontend and then its added to the serializer 
     class Meta: 
         model = Comment
         fields = '__all__'
+
+    def get_replies(self, comment): # takes a comment instance to be serialized
+        replies = comment.replies.all() # Fetch the related replies for the comment
+        reply_serializer = self.__class__(replies, many=True)  # Serialize the replies
+        return reply_serializer.data
 
 # postserializer - to serialize the post models
 class PostSerializer(ModelSerializer):
@@ -30,7 +35,6 @@ class UserProfileSerializer(ModelSerializer):
         fields = '__all__'
 
 
-
 # Login Register serializer 
 class RegisterSerializer(ModelSerializer):
     # here we are creating new attributes email, pw1 and pw2
@@ -44,8 +48,7 @@ class RegisterSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        # these are the attributes that our registration form will contain 
-        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name')
+        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name') # these are the attributes that our registration form will contain 
         # we then set extra validations with the extra_kwargs option
         extra_kwargs = {
             'first_name': {'required': True},
@@ -68,7 +71,6 @@ class RegisterSerializer(ModelSerializer):
             last_name=validated_data['last_name']
         )
 
-            
         user.set_password(validated_data['password'])
         user.save()
 
