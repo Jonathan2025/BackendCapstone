@@ -65,6 +65,7 @@ class Comment(models.Model):
 
 class UserProfile(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_profile_username', null=True, blank=True)
+    username = models.CharField(max_length=50, default='Default Username') #The username will be passed through the frontend when the user creates a profile
     first_name = models.CharField(max_length=25, null=True, blank=True)
     last_name = models.CharField(max_length=25, null=True, blank=True)
     beltLevel = models.CharField(max_length=25, null=True, blank=True)

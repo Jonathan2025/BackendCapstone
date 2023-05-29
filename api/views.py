@@ -133,7 +133,6 @@ def deletePost(request, id):
 
 # GET UserProfile - get all of the user profiles that have been made 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def getUserProfiles(request):  
     userProfiles = UserProfile.objects.all() # query for all of the user profiles that have been made
     serializer = UserProfileSerializer(userProfiles, many=True) # here we will use the serializer. We pass in the userProfiles object
