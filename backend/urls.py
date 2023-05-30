@@ -16,9 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include 
+from django.conf import settings # To upload video files we need to add these imports
+from django.conf.urls.static import static 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')), # 4 this means that any path that is '' let the urls.py in the api folder deal with it 
-
+    path('api/', include('api.urls')), # Any path that is '' let the urls.py in the api folder deal with it 
 ]
+
+# when DEBUG is set to True in settings, Django will be able to server static and media files
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

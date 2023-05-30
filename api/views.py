@@ -12,6 +12,11 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework import generics
 
+# Import these to use azure storage 
+from azure.storage.blob import BlobServiceClient
+import uuid
+from rest_framework.parsers import MultiPartParser
+
 
 # Create your views here.
 
@@ -93,14 +98,35 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
 
-#CREATE Post - create a singular post 
+
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def createPost(request):
+    file = request.FILES.get('upload')
     data = request.data
-    post = Post.objects.create(**data) # when we create the post, we want to pass in all the attributes
+   
+    # print(data)
+    # Extract the file from the request
+    # if file: 
+        #run some code to handle the file upload such as saving it to azure
+    # data = request.data.copy()
+    # data.pop('upload')  # Remove the file object from the data dictionary
+    # We need to separate the uploaded file from the data and then create a post with the both separately
+    data = {k: v for k, v in request.data.items() if k != 'upload'}
+
+    post = Post.objects.create(upload=file, **data)
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
 
 
 # PUT post - UPDATE a specific post 
@@ -111,7 +137,6 @@ def updatePost(request, id):
     post = Post.objects.get(id=id)
     serializer = PostSerializer(instance = post, data = data) # we pass in the instance of the note that we are serializing and then we are passing in the new data
     
-
     #is_valid perform validation of input data and confirm that this data contain all required fields and all fields have correct types.
     # This is then used to update the data in the DB
     if serializer.is_valid():
@@ -264,6 +289,3 @@ def deletePostComment(request, id):
 
 #----------------------------------------------------------------------------------
 
-# Here we want to build out the view for the video upload 
-# from django.views import view
-# from django.http import JsonResponse

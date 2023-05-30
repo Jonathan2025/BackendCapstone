@@ -23,9 +23,9 @@ from datetime import timedelta
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-# SECRET_KEY = 'django-insecure-+i$f*btncs^m^l&3q=@a9+8cb3$k^d(#wwf(9a$#7j-yy5$09w'
-SECRET_KEY = os.getenv('SECRET_KEY')
-print(SECRET_KEY)
+SECRET_KEY = 'django-insecure-+i$f*btncs^m^l&3q=@a9+8cb3$k^d(#wwf(9a$#7j-yy5$09w'
+# SECRET_KEY = os.getenv('SECRET_KEY')
+# print(SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -185,11 +185,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Need to add this to upload media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # We need to set the CORs origins - the domains that are able to access our django endpoints
 CORS_ALLOWED_ORIGINS = [

@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from localflavor.us.models import USStateField, USZipCodeField
 from django.contrib.auth.models import User
 from django.conf import settings
+from .validators import file_size
 # Create your models here.
 
 class Post(models.Model):
@@ -10,9 +11,8 @@ class Post(models.Model):
     category=models.CharField(max_length=25, null=True, blank=True)
     postDesc=models.TextField(null=True, blank=True)
     
-    # upload = models.FileField(upload_to)
-    
-    upload = models.CharField(max_length=250) # Since media will upload to Azure, theres no need to define a specific data type , but we can use a URLfield or charfield to store the URL/ identifier of the media file in azure
+    # upload = models.CharField(max_length=250) # Since media will upload to Azure, theres no need to define a specific data type , but we can use a URLfield or charfield to store the URL/ identifier of the media file in azure
+    upload = models.FileField(upload_to="uploads", validators=[file_size]) 
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted

@@ -8,8 +8,6 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-
-
 urlpatterns = [
     path('', views.getRoutes, name="routes"), # this will be like the home page route 
 
@@ -41,9 +39,4 @@ urlpatterns = [
     path('posts/<str:id>/createComment', views.createPostComment, name="create-comment"),
     path('posts/<str:id>/updateComment', views.updatePostComment, name="update-comment"),
     path('posts/<str:id>/deleteComment', views.deletePostComment, name="delete-comment")
-
-
-    # lets create some video routes
-
-
 ]
