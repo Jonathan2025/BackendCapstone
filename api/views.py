@@ -262,6 +262,8 @@ def deletePostComment(request, id):
 
 
 
+#----------------------------------------------------------------------------------
 
-
-  
+# Here we want to build out the view for the video upload 
+from django.views import view
+from django.http import JsonResponse
