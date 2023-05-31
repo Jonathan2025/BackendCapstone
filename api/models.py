@@ -10,8 +10,6 @@ class Post(models.Model):
     title=models.CharField(max_length=50, null=True, blank=True)
     category=models.CharField(max_length=25, null=True, blank=True)
     postDesc=models.TextField(null=True, blank=True)
-    
-    # upload = models.CharField(max_length=250) # Since media will upload to Azure, theres no need to define a specific data type , but we can use a URLfield or charfield to store the URL/ identifier of the media file in azure
     upload = models.FileField(upload_to="uploads", validators=[file_size]) 
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post

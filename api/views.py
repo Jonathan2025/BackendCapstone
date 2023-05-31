@@ -103,13 +103,20 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 def createPost(request):
     file = request.FILES.get('upload')
     data = request.data
-   
-    # print(data)
-    # Extract the file from the request
+    
     # if file: 
-        #run some code to handle the file upload such as saving it to azure
-    # data = request.data.copy()
-    # data.pop('upload')  # Remove the file object from the data dictionary
+    #     try: 
+    #         filename = file.name 
+    #         file_upload_name = str(uuid.uuid4()) + filename
+    #         connection_string = 'DefaultEndpointsProtocol=https;AccountName=capstonefilestorage;AccountKey=8A6hI9IadWzmLIRIHphVlbfFk/P7OytzB47Q8CaCwBBOLA0KFNCqnRVAPc/OeaKdlzd+gDEr1w0E+AStLlkB5g==;EndpointSuffix=core.windows.net'
+    #         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    #         container_name = 'capstonecontainer'
+    #         container_client = blob_service_client.get_container_client(container_name)
+    #         container_client.upload_blob(name=file_upload_name, data=file)
+    #         return Response( { "status": "success", "uploaded_file_name": file_upload_name}, status=201)
+    #     except Exception as e:
+    #         return Response({"status": "error", "message": str(e)}, status=400)
+
     # We need to separate the uploaded file from the data and then create a post with the both separately
     data = {k: v for k, v in request.data.items() if k != 'upload'}
 

@@ -13,8 +13,8 @@ import os
 from pathlib import Path
 import dotenv
 dotenv.read_dotenv()
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+BASE_DIR = Path(__file__).resolve().parent.parent # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 from datetime import timedelta
 
@@ -22,7 +22,6 @@ from datetime import timedelta
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
 SECRET_KEY = 'django-insecure-+i$f*btncs^m^l&3q=@a9+8cb3$k^d(#wwf(9a$#7j-yy5$09w'
 # SECRET_KEY = os.getenv('SECRET_KEY')
 # print(SECRET_KEY)
@@ -46,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
+
     
 
 ]
@@ -185,16 +185,31 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
 # Need to add this to upload media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# from .custom_storage.custom_azure import PublicAzureStorage
+
+# To use Azure upload we use this
+STORAGES = {
+    "default": {"BACKEND": "storages.backends.azure_storage.AzureStorage"},
+    "staticfiles": {"BACKEND": "backend.custom_storage.custom_azure.PublicAzureStorage"},
+}
+
+AZURE_CONTAINER = 'capstonecontainer'
+AZURE_ACCOUNT_NAME = 'capstonefilestorage'
+AZURE_ACCOUNT_KEY = '8A6hI9IadWzmLIRIHphVlbfFk/P7OytzB47Q8CaCwBBOLA0KFNCqnRVAPc/OeaKdlzd+gDEr1w0E+AStLlkB5g=='
+   
 # We need to set the CORs origins - the domains that are able to access our django endpoints
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
