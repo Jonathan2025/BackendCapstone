@@ -21,18 +21,13 @@ from datetime import timedelta
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+i$f*btncs^m^l&3q=@a9+8cb3$k^d(#wwf(9a$#7j-yy5$09w'
-# SECRET_KEY = os.getenv('SECRET_KEY')
-# print(SECRET_KEY)
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
+DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
 ALLOWED_HOSTS = []
 
 
 # Application definition
-# 1 we need to connect to the api.apps.appconfig which is in the api folder
+# We need to connect to the api.apps.appconfig which is in the api folder
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -191,23 +186,21 @@ STATIC_URL = 'static/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
+# Default primary key field type https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# from .custom_storage.custom_azure import PublicAzureStorage
-
-# To use Azure upload we use this
+# Need to add this code to send files up to microsoft azure
+from .custom_storage.custom_azure import PublicAzureStorage
 STORAGES = {
     "default": {"BACKEND": "storages.backends.azure_storage.AzureStorage"},
     "staticfiles": {"BACKEND": "backend.custom_storage.custom_azure.PublicAzureStorage"},
 }
 
-AZURE_CONTAINER = 'capstonecontainer'
-AZURE_ACCOUNT_NAME = 'capstonefilestorage'
-AZURE_ACCOUNT_KEY = '8A6hI9IadWzmLIRIHphVlbfFk/P7OytzB47Q8CaCwBBOLA0KFNCqnRVAPc/OeaKdlzd+gDEr1w0E+AStLlkB5g=='
-   
+AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
+AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+
+
 # We need to set the CORs origins - the domains that are able to access our django endpoints
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
