@@ -12,11 +12,11 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework import generics
 
-# Import these to use azure storage 
+from backend.custom_storage.custom_azure import PublicAzureStorage
 from azure.storage.blob import BlobServiceClient
-import uuid
-from rest_framework.parsers import MultiPartParser
-
+import os
+import dotenv
+from urllib.parse import urlparse
 
 # Create your views here.
 
@@ -94,6 +94,7 @@ def getPosts(request):
 # @permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they can access a certain post 
 def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
     post = Post.objects.get(id=id) # query to get the post id from the url params
+    
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
@@ -103,38 +104,12 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 def createPost(request):
     file = request.FILES.get('upload')
     data = request.data
-    
-    # if file: 
-    #     try: 
-    #         filename = file.name 
-    #         file_upload_name = str(uuid.uuid4()) + filename
-    #         connection_string = 'DefaultEndpointsProtocol=https;AccountName=capstonefilestorage;AccountKey=8A6hI9IadWzmLIRIHphVlbfFk/P7OytzB47Q8CaCwBBOLA0KFNCqnRVAPc/OeaKdlzd+gDEr1w0E+AStLlkB5g==;EndpointSuffix=core.windows.net'
-    #         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    #         container_name = 'capstonecontainer'
-    #         container_client = blob_service_client.get_container_client(container_name)
-    #         container_client.upload_blob(name=file_upload_name, data=file)
-    #         return Response( { "status": "success", "uploaded_file_name": file_upload_name}, status=201)
-    #     except Exception as e:
-    #         return Response({"status": "error", "message": str(e)}, status=400)
-
     # We need to separate the uploaded file from the data and then create a post with the both separately
     data = {k: v for k, v in request.data.items() if k != 'upload'}
-
+    # Dictionary comprehension - for loop goes through each k-v pair in request.data.items(). Filters out if the key is "upload"
     post = Post.objects.create(upload=file, **data)
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)
-
-
-
-
-
-
-
-
-
-
-
-
 
 # PUT post - UPDATE a specific post 
 @api_view(['PUT'])
@@ -154,10 +129,27 @@ def updatePost(request, id):
 
 # DELETE POST
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def deletePost(request, id):
     post = Post.objects.get(id=id)
-    post.delete()
+    
+    # Deleting a post requires 1) Deleting of the Post and then 2) File from Azure
+    upload_url = post.upload.url # we get back the url of the file that was uploaded
+    blob_name = "uploads/" + os.path.basename(upload_url) # Extracting the name of the blob/file which is in an uploads folder in azure
+    azure_container = os.getenv('AZURE_CONTAINER')
+    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
+  
+    blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
+    blob_container_client = blob_service_client.get_container_client(azure_container)
+    blob_client = blob_container_client.get_blob_client(blob_name)
+
+    blob_exists = blob_client.exists()
+    if blob_exists:
+        blob_client.delete_blob()
+    else:
+        print("The specified blob does not exist.")
+
+    post.delete() #Now comes deleting of the post
     return Response('Post has been deleted')
 
 
@@ -291,8 +283,3 @@ def deletePostComment(request, id):
         return Response({'message': 'Comment has been deleted'})
     except Comment.DoesNotExist:
         return Response({'error': 'Comment does not exist'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-#----------------------------------------------------------------------------------
-
