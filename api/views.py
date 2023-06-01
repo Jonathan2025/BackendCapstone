@@ -12,13 +12,10 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework import generics
 
-from backend.custom_storage.custom_azure import PublicAzureStorage
-from azure.storage.blob import BlobServiceClient
-import os
-import dotenv
-from urllib.parse import urlparse
 
+from azure.storage.blob import BlobServiceClient
 from azure.storage.blob._models import ContentSettings
+import os
 
 
 # Create your views here.
@@ -97,29 +94,40 @@ def getPosts(request):
 # @permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they can access a certain post 
 def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
     post = Post.objects.get(id=id) # query to get the post id from the url params
-    
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
-
-
     return Response(serializer.data)
 
 @api_view(['POST'])
 def createPost(request):
     file = request.FILES.get('upload')
     print("this is the file", file)
-    blob_name = "uploads/" + file.name
+    blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
    
     azure_container = os.getenv('AZURE_CONTAINER')
     azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
-
+    
+    # Here we need to make a connection to the azure account information
     blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
     blob_container_client = blob_service_client.get_container_client(azure_container)
     blob_client = blob_container_client.get_blob_client(blob_name)
 
     file_size = file.size # Get the size of the file
     chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
-    content_settings = ContentSettings(content_type='video/mp4', content_disposition='inline') # Essentially we are telling Azure what file type it should expect
+    
+    file_extension = os.path.splitext(file.name)[1].lower() # We just want to extract the file extension 
+
+    # Set the content type based on the file extension
+    if file_extension == '.jpg' or file_extension == '.jpeg':
+        content_type = 'image/jpeg'
+    elif file_extension == '.png':
+        content_type = 'image/png'
+    elif file_extension == '.mp4':
+        content_type == 'video/mp4'
+    elif file_extension == '.mov':
+        content_type = 'video/quicktime'
+        
+    content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
 
     blob_client.create_append_blob() # Create an empty blob for now
 
