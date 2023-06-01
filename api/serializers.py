@@ -1,5 +1,5 @@
 # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, URLField
 from .models import Post, UserProfile, Comment
 
 # imports needed for the register serializer
@@ -7,6 +7,13 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
+
+
+
+from azure.storage.blob import BlobServiceClient
+import os
+
+
 
 # Comment serializer - to serialize the comment model 
 class CommentSerializer(ModelSerializer):
@@ -20,13 +27,24 @@ class CommentSerializer(ModelSerializer):
         reply_serializer = self.__class__(replies, many=True)  # Serialize the replies
         return reply_serializer.data
 
+
+# In the case with working with Azure, we dont want the serializer to convert the URL from the blob 
+# class CustomURLField(URLField):
+#     def to_representation(self, value):
+#         return value  # Return the URL as-is without
+
+
+
+
 # postserializer - to serialize the post models
 class PostSerializer(ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True) #here we want to be able to get the actual comments. It needs to be outside the meta class
+
     class Meta: 
         model = Post #specify the model we will serialize 
         fields = '__all__' # here we specified that we want to serialize ALL the fields in the model, BUT we can list out certain ones  
-       
+    
+
 
 #userprofile serializer - to serialize the user profile model
 class UserProfileSerializer(ModelSerializer):

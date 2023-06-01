@@ -18,6 +18,9 @@ import os
 import dotenv
 from urllib.parse import urlparse
 
+from azure.storage.blob._models import ContentSettings
+
+
 # Create your views here.
 
 # Here we can customize the token claim
@@ -97,19 +100,40 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
-    return Response(serializer.data)
 
+
+    return Response(serializer.data)
 
 @api_view(['POST'])
 def createPost(request):
     file = request.FILES.get('upload')
-    data = request.data
-    # We need to separate the uploaded file from the data and then create a post with the both separately
+    print("this is the file", file)
+    blob_name = "uploads/" + file.name
+   
+    azure_container = os.getenv('AZURE_CONTAINER')
+    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
+
+    blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
+    blob_container_client = blob_service_client.get_container_client(azure_container)
+    blob_client = blob_container_client.get_blob_client(blob_name)
+
+    file_size = file.size # Get the size of the file
+    chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
+    content_settings = ContentSettings(content_type='video/mp4', content_disposition='inline') # Essentially we are telling Azure what file type it should expect
+
+    blob_client.create_append_blob() # Create an empty blob for now
+
+    # then into the blob we "append" the file in chunks
+    for chunk_start_index in range(0, file_size, chunk_size):
+        chunk = file.read(chunk_size)
+        blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
+
     data = {k: v for k, v in request.data.items() if k != 'upload'}
-    # Dictionary comprehension - for loop goes through each k-v pair in request.data.items(). Filters out if the key is "upload"
-    post = Post.objects.create(upload=file, **data)
+    upload_url = blob_client.url
+    post = Post.objects.create(upload=upload_url, **data)
     serializer = PostSerializer(post, many=False)
-    return Response(serializer.data)
+    return Response(serializer.data)    
+
 
 # PUT post - UPDATE a specific post 
 @api_view(['PUT'])

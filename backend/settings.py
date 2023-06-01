@@ -183,16 +183,28 @@ STATIC_URL = 'static/'
 # Default primary key field type https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Need to add this code to send files up to microsoft azure
-from .custom_storage.custom_azure import PublicAzureStorage
-STORAGES = {
-    "default": {"BACKEND": "storages.backends.azure_storage.AzureStorage"},
-    "staticfiles": {"BACKEND": "backend.custom_storage.custom_azure.PublicAzureStorage"},
-}
 
-AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
-AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
-AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+
+
+
+
+# Need to add this code to send files up to microsoft azure
+# from .custom_storage.custom_azure import PublicAzureStorage
+# STORAGES = {
+#     "default": {"BACKEND": "storages.backends.azure_storage.AzureStorage"},
+#     "staticfiles": {"BACKEND": "backend.custom_storage.custom_azure.PublicAzureStorage"},
+# }
+
+# AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
+# AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+# AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+
+
+
+
+
+
+
 
 
 # We need to set the CORs origins - the domains that are able to access our django endpoints
