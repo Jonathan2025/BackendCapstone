@@ -16,7 +16,7 @@ from rest_framework import generics
 from azure.storage.blob import BlobServiceClient
 from azure.storage.blob._models import ContentSettings
 import os
-
+import json
 
 # Create your views here.
 
@@ -100,7 +100,10 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 
 @api_view(['POST'])
 def createPost(request):
+    data = request.data
+    print("this is the data that was passed in", data)
     file = request.FILES.get('upload')
+    
     print("this is the file", file)
     blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
    
@@ -117,7 +120,7 @@ def createPost(request):
     
     file_extension = os.path.splitext(file.name)[1].lower() # We just want to extract the file extension 
 
-    # Set the content type based on the file extension
+    # Set the content type based on the file extension, limiting them to the 4 below
     if file_extension == '.jpg' or file_extension == '.jpeg':
         content_type = 'image/jpeg'
     elif file_extension == '.png':
@@ -126,6 +129,8 @@ def createPost(request):
         content_type == 'video/mp4'
     elif file_extension == '.mov':
         content_type = 'video/quicktime'
+    else:
+        return Response({'error': 'The file should be a jpeg/jpg, png, mov, or mp4'}, status=400)
         
     content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
 
@@ -136,9 +141,17 @@ def createPost(request):
         chunk = file.read(chunk_size)
         blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
 
-    data = {k: v for k, v in request.data.items() if k != 'upload'}
+
+
+    jsonData = data['data']  # Access the JSON string from the 'data' field
+    print("this is the json data we are trying to pass", jsonData)
+    data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
+
+    # data = {k: v for k, v in request.data.items() if k != 'upload'}
+    # print("here is the new data that is passed in", data)
     upload_url = blob_client.url
-    post = Post.objects.create(upload=upload_url, **data)
+    # post = Post.objects.create(upload=upload_url, **data)
+    post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'])
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)    
 
