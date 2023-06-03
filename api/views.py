@@ -91,7 +91,7 @@ def getPosts(request):
 
 # GET post - get a SINGULAR post that have been made 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they can access a certain post 
+ 
 def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
     post = Post.objects.get(id=id) # query to get the post id from the url params
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
@@ -99,12 +99,11 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     return Response(serializer.data)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they create a post
 def createPost(request):
     data = request.data
-    print("this is the data that was passed in", data)
     file = request.FILES.get('upload')
     
-    print("this is the file", file)
     blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
    
     azure_container = os.getenv('AZURE_CONTAINER')
@@ -144,37 +143,42 @@ def createPost(request):
 
 
     jsonData = data['data']  # Access the JSON string from the 'data' field
-    print("this is the json data we are trying to pass", jsonData)
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
 
-    # data = {k: v for k, v in request.data.items() if k != 'upload'}
-    # print("here is the new data that is passed in", data)
     upload_url = blob_client.url
-    # post = Post.objects.create(upload=upload_url, **data)
     post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'])
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)    
 
 
-# PUT post - UPDATE a specific post 
+
+
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def updatePost(request, id):
-    data = request.data # similar to req.body
+    # we MUST separate the data and the upload url when we save the new post
+    data = json.loads(request.data.get('data'))  # Parse the JSON data
+    upload_url = request.data.get('upload')  # Get the file URL
+
     post = Post.objects.get(id=id)
-    serializer = PostSerializer(instance = post, data = data) # we pass in the instance of the note that we are serializing and then we are passing in the new data
-    
-    #is_valid perform validation of input data and confirm that this data contain all required fields and all fields have correct types.
-    # This is then used to update the data in the DB
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    post.title = data['title']
+    post.category = data['category']
+    post.postDesc = data['postDesc']
+
+    post.upload = upload_url
+
+    post.save()
+
+    serializer = PostSerializer(post)
+    return Response(serializer.data)
+
+
+
+
+
 
 # DELETE POST
 @api_view(['DELETE'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def deletePost(request, id):
     post = Post.objects.get(id=id)
     
