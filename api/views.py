@@ -32,14 +32,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
-
 # Set up the registerview 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
-
-
 
 # The api_view decorator is part of the Django REST framework and is used to define the view function or method as an API endpoint
 # long story short, it allows us to create routes for the Django API endpoints
