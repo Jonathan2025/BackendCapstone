@@ -14,7 +14,7 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
-
+    username = models.CharField(max_length=50, default='Default Username', null=True, blank=True)
     # Class Metadata is an optional entity within a model and it is anything that is not a field. Some helpful meta data can include how to order instances, providing db table name,etc 
     class Meta:
         ordering = ['created'] # here we will order the posts by the date they were created 

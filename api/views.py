@@ -122,7 +122,7 @@ def createPost(request):
     elif file_extension == '.png':
         content_type = 'image/png'
     elif file_extension == '.mp4':
-        content_type == 'video/mp4'
+        content_type = 'video/mp4'
     elif file_extension == '.mov':
         content_type = 'video/quicktime'
     else:
@@ -141,9 +141,9 @@ def createPost(request):
 
     jsonData = data['data']  # Access the JSON string from the 'data' field
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
-
+    print(data_dict)
     upload_url = blob_client.url
-    post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'])
+    post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'], username=data_dict['username'])
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)    
 
@@ -160,6 +160,7 @@ def updatePost(request, id):
     post.title = data['title']
     post.category = data['category']
     post.postDesc = data['postDesc']
+
 
     post.upload = upload_url
 
