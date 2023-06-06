@@ -279,7 +279,28 @@ def createUserProfile(request):
 @api_view(['PUT'])
 def updateUserProfile(request, id):
     data = request.data # similar to req.body
+    print("this is the sata recieved", data)
+    picture_url = request.data.get('picture') # we must seperate the data and the picture url when we save the updated userProfile 
+    print("this is the picture_url", picture_url)
+
+
     userProfile = UserProfile.objects.get(id=id)
+
+    userProfile.picture = picture_url
+    userProfile.username=data['username'],
+    userProfile.first_name=data['first_name'],
+    userProfile.last_name=data['last_name'],
+    userProfile.beltLevel=data['beltLevel'],
+    userProfile.userDesc=data['userDesc'],
+    userProfile.martialArt=data['martialArt'],
+    userProfile.address=data['address'],
+    userProfile.city=data['city'],
+    userProfile.state=data['state'],
+    userProfile.zip_code=data['zip_code']
+
+    userProfile.save()
+
+
     serializer = UserProfileSerializer(instance = userProfile, data = data) 
     
     if serializer.is_valid():
