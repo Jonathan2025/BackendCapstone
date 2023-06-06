@@ -216,15 +216,6 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
     serializer = UserProfileSerializer(userProfile, many=False) # here we will use the serializer. We pass in the user profile object
     return Response(serializer.data)
 
-#CREATE userProfile - create a user Profile
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def createUserProfile(request):
-#     data = request.data
-#     userProfile = UserProfile.objects.create(**data) # when we create a userProfile, we want to pass in all the attributes
-#     serializer = UserProfileSerializer(userProfile, many=False)
-#     return Response(serializer.data)
-
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 def createUserProfile(request):
@@ -301,9 +292,29 @@ def updateUserProfile(request, id):
 
 # DELETE User Profile
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def deleteUserProfile(request, id):
+
     userProfile = UserProfile.objects.get(id=id)
+    print("picture", userProfile.picture)
+    print("picture url", userProfile.picture.url)
+
+    picture_url = userProfile.picture.url # we get back the url of the file that was uploaded
+    blob_name = "pictures/" + os.path.basename(picture_url) # Extracting the name of the blob/file which is in an uploads folder in azure
+
+    azure_container = os.getenv('AZURE_CONTAINER')
+    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
+  
+    blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
+    blob_container_client = blob_service_client.get_container_client(azure_container)
+    blob_client = blob_container_client.get_blob_client(blob_name)
+    blob_exists = blob_client.exists()
+
+    if blob_exists: # if the blob exists on Azure, then delete it 
+        blob_client.delete_blob()
+    else:
+        print("The specified blob does not exist.")
+
     userProfile.delete()
     return Response('User Profile has been deleted')
 
