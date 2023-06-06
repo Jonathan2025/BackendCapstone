@@ -249,19 +249,24 @@ def createUserProfile(request):
 
     picture_url = blob_client.url
 
+    jsonData = data['data']  # Access the JSON string from the 'data' field
+    data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
+    print(data_dict)
+
+
     #Essentially we want to pass in the data and the uploaded picture file separately when creating the userProfile
     userProfile = UserProfile.objects.create(
         picture=picture_url,
-        username=data['username'],
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        beltLevel=data['beltLevel'],
-        userDesc=data['userDesc'],
-        martialArt=data['martialArt'],
-        address=data['address'],
-        city=data['city'],
-        state=data['state'],
-        zip_code=data['zip_code']
+        username=data_dict['username'],
+        first_name=data_dict['first_name'],
+        last_name=data_dict['last_name'],
+        beltLevel=data_dict['beltLevel'],
+        userDesc=data_dict['userDesc'],
+        martialArt=data_dict['martialArt'],
+        address=data_dict['address'],
+        city=data_dict['city'],
+        state=data_dict['state'],
+        zip_code=data_dict['zip_code']
     )
 
 
