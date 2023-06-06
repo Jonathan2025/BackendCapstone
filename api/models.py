@@ -4,11 +4,12 @@ from localflavor.us.models import USStateField, USZipCodeField
 from django.contrib.auth.models import User
 from django.conf import settings
 from .validators import file_size
+
 # Create your models here.
 
 class Post(models.Model):
     title=models.CharField(max_length=50, null=True, blank=True)
-    category=models.CharField(max_length=25, null=True, blank=True)
+    category=models.CharField(max_length=1000, null=True, blank=True)
     postDesc=models.TextField(null=True, blank=True)
     upload = models.FileField(upload_to="uploads", validators=[file_size]) 
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
@@ -63,12 +64,12 @@ class Comment(models.Model):
     def get_comment_count(self):
         return Comment.objects.filter(post=self.post).count()
 
-
 class UserProfile(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_profile_username', null=True, blank=True)
     username = models.CharField(max_length=50, default='Default Username') #The username will be passed through the frontend when the user creates a profile
     first_name = models.CharField(max_length=25, null=True, blank=True)
     last_name = models.CharField(max_length=25, null=True, blank=True)
+    picture = models.FileField(upload_to="pictures", validators=[file_size])
     beltLevel = models.CharField(max_length=25, null=True, blank=True)
     userDesc = models.TextField(null=True, blank=True)
     martialArt = models.CharField(max_length=25, null=True, blank=True) # user enters what martial arts they practice 

@@ -160,12 +160,10 @@ def updatePost(request, id):
     post.title = data['title']
     post.category = data['category']
     post.postDesc = data['postDesc']
-
-
+    
     post.upload = upload_url
 
     post.save()
-
     serializer = PostSerializer(post)
     return Response(serializer.data)
 
@@ -219,13 +217,72 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
     return Response(serializer.data)
 
 #CREATE userProfile - create a user Profile
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def createUserProfile(request):
+#     data = request.data
+#     userProfile = UserProfile.objects.create(**data) # when we create a userProfile, we want to pass in all the attributes
+#     serializer = UserProfileSerializer(userProfile, many=False)
+#     return Response(serializer.data)
+
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def createUserProfile(request):
+    print("This is the data we get back", request.data)
     data = request.data
-    userProfile = UserProfile.objects.create(**data) # when we create a userProfile, we want to pass in all the attributes
+    picture = request.FILES.get('picture')
+
+    blob_name = "pictures/" + picture.name # the blob will go inside a pictures folder in Azure
+
+    azure_container = os.getenv('AZURE_CONTAINER')
+    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
+
+    # Here we need to make a connection to the azure account information
+    blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
+    blob_container_client = blob_service_client.get_container_client(azure_container)
+    blob_client = blob_container_client.get_blob_client(blob_name)
+
+    picture_extension = os.path.splitext(picture.name)[1].lower() # We just want to extract the picture file extension 
+
+    # set the content type based on the file extension limiting only to jpeg and png below 
+    if picture_extension == '.jpg' or picture_extension == '.jpeg':
+        content_type = 'image/jpeg'
+    elif picture_extension == '.png':
+        content_type = 'image/png'
+    else:
+        return Response({'error': 'The file should be a jpeg/jpg or png'}, status=400)
+
+    content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
+
+    blob_client.upload_blob(picture, content_settings = content_settings) #We upload the file to Azure using the content settings we defined
+
+    picture_url = blob_client.url
+
+    #Essentially we want to pass in the data and the uploaded picture file separately when creating the userProfile
+    userProfile = UserProfile.objects.create(
+        picture=picture_url,
+        username=data['username'],
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        beltLevel=data['beltLevel'],
+        userDesc=data['userDesc'],
+        martialArt=data['martialArt'],
+        address=data['address'],
+        city=data['city'],
+        state=data['state'],
+        zip_code=data['zip_code']
+    )
+
+
     serializer = UserProfileSerializer(userProfile, many=False)
     return Response(serializer.data)
+
+
+
+
+
+
+
 
 # PUT userProfile - UPDATE a userProfile
 @api_view(['PUT'])
