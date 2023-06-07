@@ -11,7 +11,7 @@ class Post(models.Model):
     title=models.CharField(max_length=50, null=True, blank=True)
     category=models.CharField(max_length=1000, null=True, blank=True)
     postDesc=models.TextField(null=True, blank=True)
-    upload = models.FileField(upload_to="uploads", validators=[file_size]) 
+    upload = models.FileField(upload_to="uploads", validators=[file_size], max_length=255) 
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
@@ -67,12 +67,12 @@ class Comment(models.Model):
 class UserProfile(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_profile_username', null=True, blank=True)
     username = models.CharField(max_length=50, default='Default Username') #The username will be passed through the frontend when the user creates a profile
-    first_name = models.CharField(max_length=25, null=True, blank=True)
-    last_name = models.CharField(max_length=25, null=True, blank=True)
-    picture = models.FileField(upload_to="pictures", validators=[file_size])
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
+    picture = models.FileField(upload_to="pictures", validators=[file_size], max_length=255)
     beltLevel = models.CharField(max_length=25, null=True, blank=True)
     userDesc = models.TextField(null=True, blank=True)
-    martialArt = models.CharField(max_length=25, null=True, blank=True) # user enters what martial arts they practice 
+    martialArt = models.CharField(max_length=100, null=True, blank=True) # user enters what martial arts they practice 
 
     address = models.CharField(_("address"), max_length=128, default="") # the getlazy text marks the strings for translation
     city = models.CharField(_("city"), max_length=64, default="")
