@@ -289,32 +289,41 @@ def updateUserProfile(request, id):
     print("this is the picture_url", picture_url)
 
 
+    jsonData = data['data']  # Access the JSON string from the 'data' field
+    data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
+    print(data_dict)
+
     userProfile = UserProfile.objects.get(id=id)
 
     userProfile.picture = picture_url
-    userProfile.username=data['username'],
-    userProfile.first_name=data['first_name'],
-    userProfile.last_name=data['last_name'],
-    userProfile.beltLevel=data['beltLevel'],
-    userProfile.userDesc=data['userDesc'],
-    userProfile.martialArt=data['martialArt'],
-    userProfile.address=data['address'],
-    userProfile.city=data['city'],
-    userProfile.state=data['state'],
-    userProfile.zip_code=data['zip_code']
+    userProfile.username = data_dict['username']
+    userProfile.first_name = data_dict['first_name']
+    userProfile.last_name = data_dict['last_name']
+    userProfile.beltLevel = data_dict['beltLevel']
+    userProfile.userDesc = data_dict['userDesc']
+    userProfile.martialArt = data_dict['martialArt']
+    userProfile.address = data_dict['address']
+    userProfile.city = data_dict['city']
+    userProfile.state = data_dict['state']
+    userProfile.zip_code = data_dict['zip_code']
 
     userProfile.save()
+    serializer = UserProfileSerializer(userProfile)
+    return Response(serializer.data)
 
-
-    serializer = UserProfileSerializer(instance = userProfile, data = data) 
+    # serializer = UserProfileSerializer(instance = userProfile, data = data) 
     
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    else:
-        print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # if serializer.is_valid():
+    #     serializer.save()
+    #     return Response(serializer.data)
+    # else:
+    #     print(serializer.errors)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    # post.save()
+    # serializer = PostSerializer(post)
+    # return Response(serializer.data)
 
 # DELETE User Profile
 @api_view(['DELETE'])
