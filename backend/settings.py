@@ -23,7 +23,7 @@ from datetime import timedelta
 
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
 DEBUG = False # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = ['127.0.0.1', 'kickflix.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1/8000', 'kickflix.herokuapp.com']
 
 
 # Application definition
@@ -183,13 +183,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-# STATIC_URL = 'static/'
+STATIC_URL = 'static/'
 
-
-
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = "/static"
 django_heroku.settings(locals())
 
 # Default primary key field type https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -198,5 +193,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # We need to set the CORs origins - the domains that are able to access our django endpoints
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://kickflix.herokuapp.com"
 ]
 
