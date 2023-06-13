@@ -88,7 +88,7 @@ def getPosts(request):
 
 # GET post - get a SINGULAR post that have been made 
 @api_view(['GET'])
- 
+@permission_classes([IsAuthenticated])
 def getPost(request, id):  #in django id You will be able to access a specific post because id is the params in the url
     post = Post.objects.get(id=id) # query to get the post id from the url params
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
@@ -151,6 +151,7 @@ def createPost(request):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updatePost(request, id):
     # we MUST separate the data and the upload url when we save the new post
     data = json.loads(request.data.get('data'))  # Parse the JSON data
@@ -166,8 +167,6 @@ def updatePost(request, id):
     post.save()
     serializer = PostSerializer(post)
     return Response(serializer.data)
-
-
 
 
 
@@ -217,7 +216,7 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
     return Response(serializer.data)
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def createUserProfile(request):
     print("This is the data we get back", request.data)
     data = request.data
@@ -273,15 +272,9 @@ def createUserProfile(request):
     serializer = UserProfileSerializer(userProfile, many=False)
     return Response(serializer.data)
 
-
-
-
-
-
-
-
 # PUT userProfile - UPDATE a userProfile
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateUserProfile(request, id):
     data = request.data # similar to req.body
     print("this is the sata recieved", data)
@@ -311,23 +304,9 @@ def updateUserProfile(request, id):
     serializer = UserProfileSerializer(userProfile)
     return Response(serializer.data)
 
-    # serializer = UserProfileSerializer(instance = userProfile, data = data) 
-    
-    # if serializer.is_valid():
-    #     serializer.save()
-    #     return Response(serializer.data)
-    # else:
-    #     print(serializer.errors)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-    # post.save()
-    # serializer = PostSerializer(post)
-    # return Response(serializer.data)
-
 # DELETE User Profile
 @api_view(['DELETE'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def deleteUserProfile(request, id):
 
     userProfile = UserProfile.objects.get(id=id)
