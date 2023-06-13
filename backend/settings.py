@@ -22,9 +22,9 @@ from datetime import timedelta
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
-DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['kickflix.herokuapp.com']
+DEBUG = False # SECURITY WARNING: don't run with debug turned on in production!
+
+ALLOWED_HOSTS = ['127.0.0.1', 'kickflix.herokuapp.com']
 
 
 # Application definition
