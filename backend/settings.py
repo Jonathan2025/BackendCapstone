@@ -45,6 +45,9 @@ INSTALLED_APPS = [
 
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Installing of the JWT authentication
 REST_FRAMEWORK = {
