@@ -23,7 +23,7 @@ from datetime import timedelta
 
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
 DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com/']
+ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
 
 
 # Application definition
