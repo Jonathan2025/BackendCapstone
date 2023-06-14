@@ -23,8 +23,8 @@ from datetime import timedelta
 
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
 DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
-
+# ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
+ALLOWED_HOSTS=['*']
 
 # Application definition
 # We need to connect to the api.apps.appconfig which is in the api folder
@@ -113,6 +113,8 @@ MIDDLEWARE = [
 
 ]
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -196,5 +198,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     "http://localhost:3000",
 #     "https://kickflix.herokuapp.com"
 # ]
-
-CORS_ORIGIN_ALLOW_ALL = True
