@@ -22,7 +22,7 @@ from datetime import timedelta
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
-DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False # SECURITY WARNING: don't run with debug turned on in production!
 # ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
 ALLOWED_HOSTS=['*']
 
@@ -198,3 +198,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     "http://localhost:3000",
 #     "https://kickflix.herokuapp.com"
 # ]
+
+
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
