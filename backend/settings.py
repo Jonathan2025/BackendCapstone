@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import django_heroku
+import dj_database_url
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,9 +24,9 @@ from datetime import timedelta
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
-DEBUG = False # SECURITY WARNING: don't run with debug turned on in production!
-# ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
-ALLOWED_HOSTS=['*']
+DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
+ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
+
 
 # Application definition
 # We need to connect to the api.apps.appconfig which is in the api folder
@@ -40,9 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
-
-    
-
 ]
 
 
@@ -53,7 +52,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
-
 
 # JWT settings 
 
@@ -113,8 +111,6 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -136,8 +132,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+# Database https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
 DATABASES = {
@@ -188,37 +183,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-django_heroku.settings(locals())
+
 
 # Default primary key field type https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # We need to set the CORs origins - the domains that are able to access our django endpoints
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "https://kickflix.herokuapp.com"
-# ]
-
-
-
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
 ]
 
 
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
+django_heroku.settings(locals())
