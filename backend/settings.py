@@ -210,7 +210,7 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-
+print("do WE GET this ? ", os.getenv('TEST'))
 
 
 django_heroku.settings(locals())
