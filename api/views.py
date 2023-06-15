@@ -17,6 +17,7 @@ from azure.storage.blob._models import ContentSettings
 import os
 import json
 # Create your views here.
+
 # Here we can customize the token claim
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -32,6 +33,8 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+
+
 # The api_view decorator is part of the Django REST framework and is used to define the view function or method as an API endpoint
 # long story short, it allows us to create routes for the Django API endpoints
 @api_view(['GET'])
@@ -78,6 +81,7 @@ def getPosts(request):
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
     serializer = PostSerializer(posts, many=True) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
+
 # GET post - get a SINGULAR post that have been made 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -92,33 +96,18 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 def createPost(request):
     data = request.data
     file = request.FILES.get('upload')
-    print("this is the data", data)
-    print("this is the file", file)
-    
     blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
-    print("this is the blob name", blob_name)
-
-
-
-    azure_container = os.getenv('AZURE_CONTAINER')
-    print("this is the azure container", azure_container)
-    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
-    print("this is the azure connection string", azure_connection_string)
     
-    # Here we need to make a connection to the azure account information
+    # Here we need to make a connection to Azure using the azure account information
+    azure_container = os.getenv('AZURE_CONTAINER')
+    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
     blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
-    print("this is the blob_service_client", blob_service_client)
     blob_container_client = blob_service_client.get_container_client(azure_container)
-    print("this is the blob_container_client", blob_container_client)
     blob_client = blob_container_client.get_blob_client(blob_name)
-    print("this is the blob_client", blob_name)
 
     file_size = file.size # Get the size of the file
     chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
-    
     file_extension = os.path.splitext(file.name)[1].lower() # We just want to extract the file extension 
-
-    print("this is the file extension", file_extension)
 
     # Set the content type based on the file extension, limiting them to the 4 below
     if file_extension == '.jpg' or file_extension == '.jpeg':
@@ -133,45 +122,29 @@ def createPost(request):
         return Response({'error': 'The file should be a jpeg/jpg, png, mov, or mp4'}, status=400)
         
     content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
-    print("this is the content settings", content_settings)
 
-    print("Before try-except")
+    #First we want to create an empty blob
     try:
         blob_client.create_append_blob()
         print("Append blob created successfully")
     except Exception as e:
         print("Error creating append blob:", str(e))
-    print("after try except")
 
-
-    # blob_client.create_append_blob() # Create an empty blob for now
-    # print("this is the blob client create append blob", blob_client.create_append_blob())
-    # then into the blob we "append" the file in chunks
+    # Essentially we are just breaking up the file into chunks so that its easier to upload in the blob
     for chunk_start_index in range(0, file_size, chunk_size):
         chunk = file.read(chunk_size)
         blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
 
-
-    # jsonData = data['data']  # Access the JSON string from the 'data' field
     jsonData = data.get('data')  # Access the JSON string from the 'data' field
-    
-
-
-    print("this is json data", jsonData)
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
-    print("this is the data dictionary", data_dict)
     upload_url = blob_client.url
-    print("this is the uplaod url", upload_url)
+
+    # Here we pass in the data fields being used to create the post
     post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'], username=data_dict['username'])
-    
-    print("this is the post", post)
-    
     serializer = PostSerializer(post, many=False)
-    print("this is the response we get back", Response(serializer.data))
     return Response(serializer.data)    
 
-
-
+#UPDATE Post
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updatePost(request, id):
@@ -187,8 +160,6 @@ def updatePost(request, id):
     post.save()
     serializer = PostSerializer(post)
     return Response(serializer.data)
-
-
 
 # DELETE POST
 @api_view(['DELETE'])
@@ -206,10 +177,12 @@ def deletePost(request, id):
     blob_container_client = blob_service_client.get_container_client(azure_container)
     blob_client = blob_container_client.get_blob_client(blob_name)
     blob_exists = blob_client.exists()
+
     if blob_exists:
-        blob_client.delete_blob()
+        blob_client.delete_blob() # We must delete the blob from azure 
     else:
         print("The specified blob does not exist.")
+
     post.delete() #Now comes deleting of the post
     return Response('Post has been deleted')
 
@@ -220,6 +193,7 @@ def getUserProfiles(request):
     userProfiles = UserProfile.objects.all() # query for all of the user profiles that have been made
     serializer = UserProfileSerializer(userProfiles, many=True) # here we will use the serializer. We pass in the userProfiles object
     return Response(serializer.data)
+
 # GET user profile - get a SINGULAR user profile that have been made 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -228,6 +202,8 @@ def getUserProfile(request, id):  #in django id You will be able to access a spe
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
     serializer = UserProfileSerializer(userProfile, many=False) # here we will use the serializer. We pass in the user profile object
     return Response(serializer.data)
+
+#CREATE User Profile
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createUserProfile(request):
@@ -237,11 +213,13 @@ def createUserProfile(request):
     blob_name = "pictures/" + picture.name # the blob will go inside a pictures folder in Azure
     azure_container = os.getenv('AZURE_CONTAINER')
     azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
+
     # Here we need to make a connection to the azure account information
     blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
     blob_container_client = blob_service_client.get_container_client(azure_container)
     blob_client = blob_container_client.get_blob_client(blob_name)
     picture_extension = os.path.splitext(picture.name)[1].lower() # We just want to extract the picture file extension 
+
     # set the content type based on the file extension limiting only to jpeg and png below 
     if picture_extension == '.jpg' or picture_extension == '.jpeg':
         content_type = 'image/jpeg'
@@ -249,13 +227,14 @@ def createUserProfile(request):
         content_type = 'image/png'
     else:
         return Response({'error': 'The file should be a jpeg/jpg or png'}, status=400)
+    
     content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
     blob_client.upload_blob(picture, content_settings = content_settings) #We upload the file to Azure using the content settings we defined
     picture_url = blob_client.url
+
     jsonData = data['data']  # Access the JSON string from the 'data' field
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
-    print(data_dict)
-
+  
     #Essentially we want to pass in the data and the uploaded picture file separately when creating the userProfile
     userProfile = UserProfile.objects.create(
         picture=picture_url,
@@ -270,21 +249,19 @@ def createUserProfile(request):
         state=data_dict['state'],
         zip_code=data_dict['zip_code']
     )
-
     serializer = UserProfileSerializer(userProfile, many=False)
     return Response(serializer.data)
+
 # PUT userProfile - UPDATE a userProfile
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateUserProfile(request, id):
     data = request.data # similar to req.body
-    print("this is the sata recieved", data)
     picture_url = request.data.get('picture') # we must seperate the data and the picture url when we save the updated userProfile 
-    print("this is the picture_url", picture_url)
-
+   
     jsonData = data['data']  # Access the JSON string from the 'data' field
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
-    print(data_dict)
+  
     userProfile = UserProfile.objects.get(id=id)
     userProfile.picture = picture_url
     userProfile.username = data_dict['username']
@@ -300,14 +277,14 @@ def updateUserProfile(request, id):
     userProfile.save()
     serializer = UserProfileSerializer(userProfile)
     return Response(serializer.data)
+
 # DELETE User Profile
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteUserProfile(request, id):
     userProfile = UserProfile.objects.get(id=id)
-    print("picture", userProfile.picture)
-    print("picture url", userProfile.picture.url)
     picture_url = userProfile.picture.url # we get back the url of the file that was uploaded
+
     blob_name = "pictures/" + os.path.basename(picture_url) # Extracting the name of the blob/file which is in an uploads folder in azure
     azure_container = os.getenv('AZURE_CONTAINER')
     azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
@@ -316,10 +293,12 @@ def deleteUserProfile(request, id):
     blob_container_client = blob_service_client.get_container_client(azure_container)
     blob_client = blob_container_client.get_blob_client(blob_name)
     blob_exists = blob_client.exists()
+
     if blob_exists: # if the blob exists on Azure, then delete it 
         blob_client.delete_blob()
     else:
         print("The specified blob does not exist.")
+
     userProfile.delete()
     return Response('User Profile has been deleted')
 #----------------------------------------------------------------------------------
@@ -329,6 +308,7 @@ def getComments(request):
     comments = Comment.objects.all() 
     serializer = CommentSerializer(comments, many=True) 
     return Response(serializer.data)
+
 # GET Post Comments - get all the comments for a specific post
 @api_view(['GET'])
 def getPostComments(request, id):
@@ -339,6 +319,7 @@ def getPostComments(request, id):
         return Response(serializer.data)
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+    
 # CREATE Comment 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -361,6 +342,7 @@ def createPostComment(request, id):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Post.DoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+    
 #Update an Existing Comment 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -376,6 +358,7 @@ def updatePostComment(request, id):
     else: 
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 # Delete an existing comment 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

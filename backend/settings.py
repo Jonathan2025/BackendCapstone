@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import django_heroku
-import dj_database_url
-
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +24,6 @@ from datetime import timedelta
 SECRET_KEY = os.getenv('SECRET_KEY') # SECURITY WARNING: keep the secret key used in production secret!
 DEBUG = True # SECURITY WARNING: don't run with debug turned on in production!
 ALLOWED_HOSTS = ['127.0.0.1/8000', 'https://kickflix.herokuapp.com']
-
 
 # Application definition
 # We need to connect to the api.apps.appconfig which is in the api folder
@@ -42,9 +39,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
-
-    'cloudinary_storage',
-    'cloudinary',
 ]
 
 
@@ -110,8 +104,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -186,8 +178,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-
-
 # Default primary key field type https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -196,21 +186,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     'https://kickflix.herokuapp.com'
 ]
-
-
-#Making Cloudinary our default file storage 
-# MEDIA_URL = '/media/'
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-
-# Adding the Cloudinary storage config
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-#     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-#     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
-# }
-
-
-
 
 django_heroku.settings(locals())
