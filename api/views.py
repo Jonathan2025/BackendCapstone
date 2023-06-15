@@ -129,6 +129,7 @@ def createPost(request):
     blob_client = blob_container_client.get_blob_client(blob_name)
     print("this is the blob_client", blob_name)
 
+
     file_size = file.size # Get the size of the file
     chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
     
@@ -154,7 +155,17 @@ def createPost(request):
     print("this is the content settings", content_settings)
 
 
-    blob_client.create_append_blob() # Create an empty blob for now
+
+    try:
+        blob_client.create_append_blob()
+        print("Append blob created successfully")
+    except Exception as e:
+        print("Error creating append blob:", str(e))
+
+
+
+
+    # blob_client.create_append_blob() # Create an empty blob for now
 
     print("this is the blob client create append blob", blob_client.create_append_blob())
 
@@ -163,7 +174,7 @@ def createPost(request):
         chunk = file.read(chunk_size)
         print("This is the chunk", chunk)
         blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
-        
+
 
 
     jsonData = data['data']  # Access the JSON string from the 'data' field
