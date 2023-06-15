@@ -86,6 +86,7 @@ def getPost(request, id):  #in django id You will be able to access a specific p
     # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them 
     serializer = PostSerializer(post) # here we will use the serializer. We pass in the posts object
     return Response(serializer.data)
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they create a post
 def createPost(request):
@@ -144,15 +145,18 @@ def createPost(request):
 
 
     # blob_client.create_append_blob() # Create an empty blob for now
-    print("this is the blob client create append blob", blob_client.create_append_blob())
+    # print("this is the blob client create append blob", blob_client.create_append_blob())
     # then into the blob we "append" the file in chunks
     for chunk_start_index in range(0, file_size, chunk_size):
         chunk = file.read(chunk_size)
-        print("This is the chunk", chunk)
         blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
 
 
-    jsonData = data['data']  # Access the JSON string from the 'data' field
+    # jsonData = data['data']  # Access the JSON string from the 'data' field
+    jsonData = data.get('data')  # Access the JSON string from the 'data' field
+    
+
+
     print("this is json data", jsonData)
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
     print("this is the data dictionary", data_dict)
