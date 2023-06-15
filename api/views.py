@@ -107,19 +107,36 @@ def createPost(request):
 
     
     blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
-   
+    print("this is the blob name", blob_name)
+
+
+
+
     azure_container = os.getenv('AZURE_CONTAINER')
+    print("this is the azure container", azure_container)
+
     azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
+    print("this is the azure connection string", azure_connection_string)
+
     
     # Here we need to make a connection to the azure account information
     blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
+    print("this is the blob_service_client", blob_service_client)
+
     blob_container_client = blob_service_client.get_container_client(azure_container)
+    print("this is the blob_container_client", blob_container_client)
+
     blob_client = blob_container_client.get_blob_client(blob_name)
+    print("this is the blob_client", blob_name)
 
     file_size = file.size # Get the size of the file
     chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
     
     file_extension = os.path.splitext(file.name)[1].lower() # We just want to extract the file extension 
+
+
+    print("this is the file extension", file_extension)
+
 
     # Set the content type based on the file extension, limiting them to the 4 below
     if file_extension == '.jpg' or file_extension == '.jpeg':
@@ -134,14 +151,19 @@ def createPost(request):
         return Response({'error': 'The file should be a jpeg/jpg, png, mov, or mp4'}, status=400)
         
     content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
+    print("this is the content settings", content_settings)
+
 
     blob_client.create_append_blob() # Create an empty blob for now
+
+    print("this is the blob client create append blob", blob_client.create_append_blob())
 
     # then into the blob we "append" the file in chunks
     for chunk_start_index in range(0, file_size, chunk_size):
         chunk = file.read(chunk_size)
+        print("This is the chunk", chunk)
         blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
-
+        
 
 
     jsonData = data['data']  # Access the JSON string from the 'data' field
@@ -150,9 +172,19 @@ def createPost(request):
 
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
     print("this is the data dictionary", data_dict)
+
     upload_url = blob_client.url
+
+    print("this is the uplaod url", upload_url)
+
     post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'], username=data_dict['username'])
+    
+    print("this is the post", post)
+    
     serializer = PostSerializer(post, many=False)
+
+    print("this is the response we get back", Response(serializer.data))
+
     return Response(serializer.data)    
 
 
