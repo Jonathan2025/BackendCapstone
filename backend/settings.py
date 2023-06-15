@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
+
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 
@@ -193,6 +196,21 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     'https://kickflix.herokuapp.com'
 ]
+
+
+#Making Cloudinary our default file storage 
+MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+# Adding the Cloudinary storage config
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+
 
 
 django_heroku.settings(locals())

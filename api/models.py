@@ -11,7 +11,7 @@ class Post(models.Model):
     title=models.CharField(max_length=50, null=True, blank=True)
     category=models.CharField(max_length=1000, null=True, blank=True)
     postDesc=models.TextField(null=True, blank=True)
-    upload = models.FileField(upload_to="uploads", validators=[file_size], max_length=255) 
+    upload = models.FileField(upload_to="uploads", validators=[file_size], max_length=255) # In cloudinary this will go to an uploads folder
     created = models.DateTimeField(auto_now_add=True) # only take the timestamp of the creation of the post
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
@@ -20,9 +20,6 @@ class Post(models.Model):
     class Meta:
         ordering = ['created'] # here we will order the posts by the date they were created 
 
-    # override the default __str__ method to return the title and category of the post 
-    def __str__(self): 
-        return self.title + ', ' + self.category
 
 # User Model
 # We will be using the default USER model that comes with django.contrib.auth¶
@@ -79,10 +76,3 @@ class UserProfile(models.Model):
     state = USStateField(_("state"), default="")
     zip_code = USZipCodeField(_("zip code"), default="")
 
-    # override the default __str__ method to return the first and last name of the user along with the martial art they practice
-    def __str__(self): 
-        return self.first_name + ' ' + self.last_name + f' (${self.martialArt})'
-    
-    # define a string method that will give the full location of the user
-    def user_location(self):
-        return self.address + ', ' + self.city + ', ' + self.state + ', ' + self.zip_code
