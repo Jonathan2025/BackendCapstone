@@ -155,13 +155,13 @@ def createPost(request):
     print("this is the content settings", content_settings)
 
 
-
+    print("Before try-except")
     try:
         blob_client.create_append_blob()
         print("Append blob created successfully")
     except Exception as e:
         print("Error creating append blob:", str(e))
-
+    print("after try except")
 
 
 
