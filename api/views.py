@@ -12,9 +12,8 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework import generics
 
+import cloudinary.uploader
 
-from azure.storage.blob import BlobServiceClient
-from azure.storage.blob._models import ContentSettings
 import os
 import json
 
@@ -100,95 +99,71 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 def createPost(request):
 
     data = request.data
-    file = request.FILES.get('upload')
+    
+    file = request.data.get('upload')
 
     print("this is the data", data)
-    print("this is the file", file)
-
-    
-    blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
-    print("this is the blob name", blob_name)
-
-
-
-
-    azure_container = os.getenv('AZURE_CONTAINER')
-    print("this is the azure container", azure_container)
-
-    azure_connection_string = os.getenv('AZURE_CONNECTION_STRING')
-    print("this is the azure connection string", azure_connection_string)
-
-    
-    # Here we need to make a connection to the azure account information
-    blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
-    print("this is the blob_service_client", blob_service_client)
-
-    blob_container_client = blob_service_client.get_container_client(azure_container)
-    print("this is the blob_container_client", blob_container_client)
-
-    blob_client = blob_container_client.get_blob_client(blob_name)
-    print("this is the blob_client", blob_name)
-
+    print("this is the file ", file)
+    print("this is the file name ", file.name)
 
     file_size = file.size # Get the size of the file
-    chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
+    
     
     file_extension = os.path.splitext(file.name)[1].lower() # We just want to extract the file extension 
 
-
+    print("this is the file size", file_size)
     print("this is the file extension", file_extension)
 
+    
 
-    # Set the content type based on the file extension, limiting them to the 4 below
-    if file_extension == '.jpg' or file_extension == '.jpeg':
-        content_type = 'image/jpeg'
-    elif file_extension == '.png':
-        content_type = 'image/png'
-    elif file_extension == '.mp4':
-        content_type = 'video/mp4'
-    elif file_extension == '.mov':
-        content_type = 'video/quicktime'
-    else:
+    
+    # limit the file types to the 4 below 
+    if file_extension == '.jpg' or file_extension == '.jpeg' or file_extension == '.png' or file_extension == '.mp4' or file_extension == '.mp4':
+        print("You have a valid file to upload")
+    else: 
         return Response({'error': 'The file should be a jpeg/jpg, png, mov, or mp4'}, status=400)
+
+  
+
+
+
+    # If we have large file that is most likely a video we should use large uploader
+    if file_size >= 10000000:
+
+        try: 
+            print("you will upload a large file")
+            upload_data = cloudinary.uploader.upload_large(file, 
+                resource_type = "video",
+                chunk_size = 6000000
+            )
+            print({
+            'status': 'success',
+            'data': upload_data,
+        }, status=201)
+        except Exception as e:
+            print("Error uploading the file:", str(e))
+    # Else if its an image we are ok using the regular uploader
+    else:
+        try: 
+            print("we will attempt to upload this file")
+            upload_data = cloudinary.uploader.upload(file)
+            print({
+                'status': 'success',
+                'data': upload_data,
+            }, status=201)
+        except Exception as e:
+            print("Error uploading the file:", str(e))
+
         
-    content_settings = ContentSettings(content_type=content_type, content_disposition='inline') # Essentially we are telling Azure what file type it should expect
-    print("this is the content settings", content_settings)
+   
+    
+    print("this is the uplaod data to see what is in it", upload_data)
+   
+    upload_url = upload_data.get('url')
+    print("this is the post url", upload_url)
 
 
-    print("Before try-except")
-    try:
-        blob_client.create_append_blob()
-        print("Append blob created successfully")
-    except Exception as e:
-        print("Error creating append blob:", str(e))
-    print("after try except")
-
-
-
-    # blob_client.create_append_blob() # Create an empty blob for now
-
-    print("this is the blob client create append blob", blob_client.create_append_blob())
-
-    # then into the blob we "append" the file in chunks
-    for chunk_start_index in range(0, file_size, chunk_size):
-        chunk = file.read(chunk_size)
-        print("This is the chunk", chunk)
-        blob_client.upload_blob(chunk, blob_type='AppendBlob', length=len(chunk), content_settings=content_settings)
-
-
-
-    jsonData = data['data']  # Access the JSON string from the 'data' field
-
-    print("this is json data", jsonData)
-
-    data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
-    print("this is the data dictionary", data_dict)
-
-    upload_url = blob_client.url
-
-    print("this is the uplaod url", upload_url)
-
-    post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'], username=data_dict['username'])
+    post = Post.objects.create(upload=upload_url, title=data['title'], category=data['category'], postDesc=data['postDesc'], username=data['username'])
     
     print("this is the post", post)
     
