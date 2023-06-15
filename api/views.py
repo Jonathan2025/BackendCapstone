@@ -98,8 +98,13 @@ def getPost(request, id):  #in django id You will be able to access a specific p
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) # ONLY if the user is authenticated then they create a post
 def createPost(request):
+
     data = request.data
     file = request.FILES.get('upload')
+
+    print("this is the data", data)
+    print("this is the file", file)
+
     
     blob_name = "uploads/" + file.name # the blob will go inside an uploads folder in azure
    
@@ -140,8 +145,11 @@ def createPost(request):
 
 
     jsonData = data['data']  # Access the JSON string from the 'data' field
+
+    print("this is json data", jsonData)
+
     data_dict = json.loads(jsonData)  # Parse the JSON string into a dictionary
-    print(data_dict)
+    print("this is the data dictionary", data_dict)
     upload_url = blob_client.url
     post = Post.objects.create(upload=upload_url, title=data_dict['title'], category=data_dict['category'], postDesc=data_dict['postDesc'], username=data_dict['username'])
     serializer = PostSerializer(post, many=False)
