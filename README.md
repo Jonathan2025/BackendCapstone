@@ -9,9 +9,9 @@ Want to learn martial arts but dont know where to start? Are you looking to rega
 
 ## Photos
 <div style="display:flex;justify-content:center;">
-  <img style="width:33%;height:200px;" alt="readme1" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/e6cd294a-4a47-4f54-9473-7aa815972fb2">
-  <img style="width:33%;height:200px;" alt="readme2" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/69bf8e07-49a7-4f6a-a80a-0c579b3735db">
-  <img style="width:33%;height:200px;" alt="readme3" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/daf48909-0020-42e4-b411-656036b5e3a1">
+  <img style="width:30%;height:225px;" alt="readme1" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/e6cd294a-4a47-4f54-9473-7aa815972fb2">
+  <img style="width:30%;height:225px;" alt="readme2" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/69bf8e07-49a7-4f6a-a80a-0c579b3735db">
+  <img style="width:30%;height:225px;" alt="readme3" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/daf48909-0020-42e4-b411-656036b5e3a1">
  </div>
  <div style="display:flex;justify-content:center;">
   <img style="width:40%;height:200px;" alt="readme4" src="https://github.com/Jonathan2025/FrontendCapstone/assets/118234157/4f3f87d5-56d4-4621-8417-92792228a0d1">
