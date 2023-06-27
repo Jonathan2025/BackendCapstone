@@ -104,7 +104,7 @@ def createPost(request):
     blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
     blob_container_client = blob_service_client.get_container_client(azure_container)
     blob_client = blob_container_client.get_blob_client(blob_name)
-
+    
     file_size = file.size # Get the size of the file
     chunk_size = 4 * 1024 * 1024  # Set the chunk size for uploading, 4MB is a good size for chunk
     file_extension = os.path.splitext(file.name)[1].lower() # We just want to extract the file extension 

@@ -16,10 +16,15 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
     username = models.CharField(max_length=50, default='Default Username', null=True, blank=True)
+
     # Class Metadata is an optional entity within a model and it is anything that is not a field. Some helpful meta data can include how to order instances, providing db table name,etc 
     class Meta:
         ordering = ['created'] # here we will order the posts by the date they were created 
 
+
+class Likes(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes") # Foreign key establishes a relationship between likes with the post, thats why we set related name to likes
+    likes = models.IntegerField(default = 0) #Front end will be a likes button that increments while the dislike will decrement
 
 # User Model
 # We will be using the default USER model that comes with django.contrib.auth¶
