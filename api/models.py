@@ -24,7 +24,8 @@ class Post(models.Model):
 
 class Likes(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes") # Foreign key establishes a relationship between likes with the post, thats why we set related name to likes
-    likes = models.IntegerField(default = 0) #Front end will be a likes button that increments while the dislike will decrement
+    likes = models.IntegerField(default = 0) #Front end will be a likes button that increments 
+    dislikes = models.IntegerField(default = 0) #Front end will be a dislike button that decrements
     username = models.CharField(max_length=50, default='Default Username', null=True, blank=True)
 
 # User Model

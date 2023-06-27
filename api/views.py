@@ -376,3 +376,8 @@ def deletePostComment(request, id):
         return Response({'message': 'Comment has been deleted'})
     except Comment.DoesNotExist:
         return Response({'error': 'Comment does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+#----------------------------------------------------------------------------------
+#Likes view 
