@@ -41,9 +41,4 @@ urlpatterns = [
     path('posts/<str:id>/deleteComment', views.deletePostComment, name="delete-comment"),
 
 
-    # Likes Routes
-    # path('posts/<str:id>/likes/', views.getPostLikes, name="postLikes"), # get all the likes for a specific post
-    # path('posts/<str:id>/likePost', views.likePost, name="like-post"),
-    # path('posts/<str:id>/dislikePost', views.dislikePost, name="dislike-post"),
-     
 ]

@@ -16,12 +16,12 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True) # take the timestamp with the UPDATE of the post
     userId = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # this means that when the referrenced object is deleted, the objects that have a foreign key pointing to it will also be deleted
     username = models.CharField(max_length=50, default='Default Username', null=True, blank=True)
-    likes = models.ManyToManyField(User, related_name='post_like') # we will be using a many to many field because a user can have many likes and a post can have many likes
+    likes = models.ManyToManyField(User, related_name='video_post') # we will be using a many to many field because a user can have many likes and a post can have many likes
 
     # Class Metadata is an optional entity within a model and it is anything that is not a field. Some helpful meta data can include how to order instances, providing db table name,etc 
     class Meta:
         ordering = ['created'] # here we will order the posts by the date they were created 
-        
+
 # User Model
 # We will be using the default USER model that comes with django.contrib.auth¶
 # The user model has the following fields, the ones that we need are 

@@ -1,6 +1,6 @@
 # Now the important thing is that we need to take our python objects and then turn them into JSON format - so we need to serialize them
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, URLField
-from .models import Post, UserProfile, Comment, Likes
+from .models import Post, UserProfile, Comment
 
 # imports needed for the register serializer
 from rest_framework import serializers
@@ -20,19 +20,11 @@ class CommentSerializer(ModelSerializer):
         replies = comment.replies.all() # Fetch the related replies for the comment
         reply_serializer = self.__class__(replies, many=True)  # Serialize the replies
         return reply_serializer.data
-    
 
-
-# Likes serializer - to serialize the likes model
-class LikesSerializer(ModelSerializer):
-    class Meta: 
-        model = Likes
-        fields = '__all__'
 
 # postserializer - to serialize the post models
 class PostSerializer(ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True) #here we want to be able to get the actual comments. It needs to be outside the meta class
-    likes = LikesSerializer(many=True, read_only=True)
 
     class Meta: 
         model = Post #specify the model we will serialize 

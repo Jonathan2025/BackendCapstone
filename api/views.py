@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response # now we will begin to use the django rest framework which will streamline the process of building APIs and endpoints
 from rest_framework.decorators import api_view, permission_classes # import permission classes
-from .models import Post, UserProfile, Comment, Likes # import our models so then in the routes we can render the data 
-from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer, RegisterSerializer, LikesSerializer # import the serializer
+from .models import Post, UserProfile, Comment# import our models so then in the routes we can render the data 
+from .serializers import PostSerializer, UserProfileSerializer, CommentSerializer, RegisterSerializer # import the serializer
 from rest_framework import status # import status so we can use the status codes 
 # Import these for UserAuthentication/ tokens/ Login/ Register 
 from rest_framework.permissions import IsAuthenticated
@@ -380,22 +380,3 @@ def deletePostComment(request, id):
 
 
 #----------------------------------------------------------------------------------
-#Likes view 
-# GET likes - get all of the likes that have been made for the ENTIRE APP
-@api_view(['GET'])
-def getLikes(request):  
-    likes = Likes.objects.all() 
-    serializer = LikesSerializer(likes, many=True) 
-    return Response(serializer.data)
-
-# Get likes - for a SPECIFIC POST 
-# GET Post Comments - get all the comments for a specific post
-@api_view(['GET'])
-def getPostComments(request, id):
-    try:
-        post = Post.objects.get(id=id)
-        comments = Comment.objects.filter(post=post)
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data)
-    except Post.DoesNotExist:
-        return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
